@@ -55,11 +55,17 @@ export interface FloatingRotation {
   follow?: readonly [number, number];
 }
 
+/**
+ * Em retrato estreito (painel embaixo), quanto o assunto se desloca na tela:
+ * [para a esquerda, em fração da largura; para cima, em fração da altura].
+ */
+export type PortraitShift = readonly [number, number];
+
 /** Câmera e máquina de uma seção. A sessão e o "tatue você" seguem a agulha. */
 export type Station =
-  | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3; rotation: FloatingRotation }
+  | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3; rotation: FloatingRotation; portraitShift?: PortraitShift }
   | { kind: "session" }
-  | { kind: "draw"; camera: Vec3; target: Vec3 };
+  | { kind: "draw"; camera: Vec3; target: Vec3; portraitShift?: PortraitShift };
 
 /** Peso de cada camada da cicatrização num estágio (0 a 1). */
 export interface HealingLayers {
@@ -428,6 +434,13 @@ export interface VisualConfig {
   };
   /** Contadores do Sobre. */
   countUp: { duration: number };
+  /**
+   * Modo leve (celular e telas de toque): sem MSAA nem bloom, menos
+   * partículas, sombras e resolução menores.
+   */
+  lightMode: { maxPixelRatio: number; shadowMapSize: number; dust: number; droplets: number };
+  /** Em telas mais estreitas que a de referência, o campo de visão abre até este limite. */
+  responsiveFov: { referenceAspect: number; max: number };
 }
 
 export const visual = {
@@ -439,7 +452,8 @@ export const visual = {
     textMuted: "#888780",
     red: "#E24B4A",
     redDark: "#A32D2D",
-    onRed: "#501313",
+    // A especificação pede #501313, que dá 3,7:1 sobre o vermelho; #300a0a dá 4,55:1 (WCAG AA).
+    onRed: "#300a0a",
     gold: "#d9ae58",
     border: "#5F5E5A",
     borderSoft: "#444441",
@@ -500,6 +514,8 @@ export const visual = {
       target: [-0.75, -0.1, 0.15],
       machine: [1.7, 1.3, -1.6],
       rotation: { tilt: [0.12, 0, 0.2], spin: 0.3 },
+      // Em retrato o painel desce: a tatuagem vai para o centro e sobe.
+      portraitShift: [0.34, 0.22],
     },
     {
       kind: "fixed",
@@ -517,7 +533,7 @@ export const visual = {
       machine: [2.3, 0.55, 0],
       rotation: { tilt: [0.06, 0.8, -0.08], spin: 0.25 },
     },
-    { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1] },
+    { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1], portraitShift: [0.3, 0.3] },
   ],
   // Percurso, velocidade, alturas, zoom parado e inclinação: protótipo.
   // Push-in, balanço, rapidez do zoom e LED: definidos aqui.
@@ -789,6 +805,8 @@ export const visual = {
   // Revelação (.9 s) e inclinação (10°/12°, -3 px) do protótipo.
   portfolio: { revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
   countUp: { duration: 1.4 },
+  lightMode: { maxPixelRatio: 1.5, shadowMapSize: 1024, dust: 160, droplets: 35 },
+  responsiveFov: { referenceAspect: 1.6, max: 62 },
   healing: [
     { red: 0.9, blur: 0.7, gloss: 1, milk: 0, flakes: 0, ink: 1 },
     { red: 0.45, blur: 0.45, gloss: 0.35, milk: 0.06, flakes: 0.12, ink: 1 },

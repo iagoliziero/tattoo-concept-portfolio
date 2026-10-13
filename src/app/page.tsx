@@ -7,6 +7,7 @@ import { ProgressLine } from "@/components/ProgressLine";
 import { SceneLoader } from "@/components/SceneLoader";
 import { ScrollController } from "@/components/ScrollController";
 import { SectionEffects } from "@/components/SectionEffects";
+import { StructuredData } from "@/components/StructuredData";
 import { About } from "@/components/sections/About";
 import { Healing } from "@/components/sections/Healing";
 import { Hero } from "@/components/sections/Hero";
@@ -30,6 +31,7 @@ const sections: Record<SectionId, ComponentType<{ id: SectionId }>> = {
 export default function Page() {
   return (
     <>
+      <StructuredData />
       <SceneLoader />
       <Header />
       <ProgressLine />

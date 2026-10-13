@@ -13,7 +13,7 @@ export function Portfolio({ id }: { id: SectionId }) {
     <section
       id={id}
       data-section
-      className={`${styles.section} ${styles.top}`}
+      className={`${styles.section} ${styles.top} ${styles.overScene}`}
       aria-labelledby={`${id}-title`}
     >
       <PortfolioGallery items={items} headingId={`${id}-title`} />

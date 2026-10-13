@@ -26,6 +26,11 @@ export interface HealingStage {
 }
 
 export interface SiteConfig {
+  /**
+   * Endereço do site publicado, como "https://tattoolucas.com.br". Usado na
+   * imagem de compartilhamento, no sitemap e nos dados estruturados. A preencher.
+   */
+  url: string | null;
   artist: {
     name: string;
     brand: string;
@@ -45,7 +50,7 @@ export interface SiteConfig {
     /** Retrato 4:5. */
     photo: ImageRef;
   };
-  meta: { title: string; description: string };
+  meta: { title: string; description: string; imageAlt: string };
   nav: readonly { id: SectionId; label: string }[];
   sound: { on: string; off: string; label: string };
   hero: {
@@ -92,6 +97,8 @@ export interface SiteConfig {
     kicker: string;
     title: string;
     text: string;
+    /** Versão do texto para telas de toque. */
+    textTouch: string;
     tools: { line: string; shade: string; clear: string };
     form: {
       name: string;
@@ -131,10 +138,12 @@ const artist = {
 } as const satisfies SiteConfig["artist"];
 
 export const site = {
+  url: null,
   artist,
   meta: {
     title: `${artist.name} · Tatuador de realismo e black & gray em ${artist.city}`,
     description: `${artist.name}, tatuador especialista em realismo e black & gray em ${artist.city} desde ${artist.since}. Veja a cicatrização, o portfólio e desenhe sua ideia direto na pele.`,
+    imageAlt: `${artist.name}, tatuador de realismo e black & gray em ${artist.city}`,
   },
   nav: [
     { id: "inicio", label: "Início" },
@@ -262,6 +271,7 @@ export const site = {
     kicker: "06 · Tatue você mesmo",
     title: "Desenhe direto na pele",
     text: "Segure o clique sobre o braço: a máquina segue o mouse e tatua. Use Sombra para fazer graywash.",
+    textTouch: "Arraste o dedo sobre o braço: a máquina segue e tatua. Use Sombra para fazer graywash.",
     tools: { line: "Traço", shade: "Sombra", clear: "Limpar" },
     form: {
       name: "Seu nome",

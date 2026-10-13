@@ -10,8 +10,8 @@ import { sceneState } from "./state";
 import { dotCanvas } from "./textures";
 
 /** Poeira dourada flutuando na luz, com uma deriva lenta. */
-export function Dust() {
-  const { count, size, color, opacity, min, max } = visual.dust;
+export function Dust({ count }: { count: number }) {
+  const { size, color, opacity, min, max } = visual.dust;
   const points = useRef<Points>(null);
   const { geometry, dot } = useMemo(() => {
     const positions = new Float32Array(count * 3);

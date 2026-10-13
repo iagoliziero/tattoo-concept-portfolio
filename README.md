@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tattoo Lucas
 
-## Getting Started
+Landing page e portfólio do tatuador Lucas Camargo (@tattoolucas): uma máquina
+de bobina em 3D que se monta sozinha, tatua o braço, mostra a cicatrização na
+pele e deixa o visitante desenhar.
 
-First, run the development server:
+Next.js (App Router, TypeScript), React Three Fiber, drei,
+@react-three/postprocessing, three.js e GSAP ScrollTrigger. O protótipo
+aprovado e a especificação estão em `referencia/`.
+
+## Rodar
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # build de produção
+npm run start    # serve o build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Onde mexer
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| O quê | Onde |
+|---|---|
+| Textos, dados do tatuador, portfólio, formulário, domínio | `src/config/site.ts` |
+| Cores, fontes, câmera, luzes, materiais, animações, efeitos | `src/config/visual.ts` |
+| Fotos do portfólio | `public/portfolio/` (`jesus.jpg`, `odin.jpg`, `aguia.jpg`, `armadura.jpg`, `catrina.jpg`, `navio.jpg`) |
+| Foto do Lucas (retrato 4:5) | `public/lucas.jpg` |
+| Envio do pedido de orçamento | `src/lib/quote.ts` |
+| Desenho da tatuagem da sessão | `src/components/scene/tattooArt.ts` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Sem as fotos, aparece um espaço reservado no lugar de cada uma. Os caminhos
+podem ser trocados em `site.ts`.
 
-## Learn More
+## Antes de publicar
 
-To learn more about Next.js, take a look at the following resources:
+1. **Envio do orçamento**: `src/lib/quote.ts` ainda não manda o pedido para
+   lugar nenhum. Em desenvolvimento ele só aparece no console; no site
+   publicado o formulário mostra "Não foi possível enviar agora", para nenhum
+   pedido se perder calado. O arquivo explica como ligar o WhatsApp ou um
+   serviço de formulário.
+2. **Domínio**: preencher `url` em `src/config/site.ts`. Sem ele, a imagem de
+   compartilhamento sai com endereço relativo e o sitemap fica vazio.
+3. **Endereço e WhatsApp**: `artist.address` e `artist.whatsapp` em
+   `site.ts` entram nos dados estruturados (schema.org TattooParlor).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Como está organizado
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app/`: página, layout com metadados, imagem de compartilhamento e
+  ícones (gerados no build com a Pirata One), robots e sitemap.
+- `src/components/sections/`: as seis seções em HTML real, renderizadas no
+  servidor.
+- `src/components/scene/`: a cena 3D, carregada só no navegador. Cada
+  arquivo cuida de uma parte: fundo, luzes, bancada, braço, tatuagem, máquina,
+  sessão, desenho do visitante, pós-processamento.
+- `src/lib/stage.ts`: estado compartilhado entre rolagem, interface e cena.
+- `assets/fonts/`: Pirata One em TTF para as imagens geradas (licença OFL em
+  `assets/fonts/OFL.txt`).
 
-## Deploy on Vercel
+## Notas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- As luzes foram recalibradas para a iluminação física do three.js atual,
+  comparando com o protótipo (three r128) renderizado lado a lado. Os valores
+  originais estão comentados em `visual.ts`.
+- Em celulares e telas de toque a cena entra em modo leve (sem MSAA e bloom,
+  menos partículas). Com `prefers-reduced-motion`, não há vibração, tremores,
+  cursor próprio nem respingos, e a máquina já aparece montada.
+- O aviso "THREE.Clock deprecated" no console vem de dentro do
+  `@react-three/fiber`, não do código do site.

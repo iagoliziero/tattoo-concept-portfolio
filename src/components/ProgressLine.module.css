@@ -16,3 +16,9 @@
   transform: scaleY(0);
   transform-origin: top;
 }
+
+@media (max-width: 640px) {
+  .track {
+    right: 6px;
+  }
+}

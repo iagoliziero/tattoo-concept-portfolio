@@ -11,9 +11,26 @@ const display = Pirata_One({
   variable: "--font-display-face",
 });
 
+const siteUrl: string | null = site.url;
+
 export const metadata: Metadata = {
+  // Sem o domínio (site.url), a imagem de compartilhamento sai com endereço relativo.
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: site.meta.title,
   description: site.meta.description,
+  alternates: siteUrl ? { canonical: "/" } : undefined,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: site.artist.brand,
+    title: site.meta.title,
+    description: site.meta.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.meta.title,
+    description: site.meta.description,
+  },
 };
 
 export const viewport: Viewport = {

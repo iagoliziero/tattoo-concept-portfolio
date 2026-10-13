@@ -49,7 +49,7 @@ void main() {
  * Spot quente seguindo o foco da câmera (com o feixe volumétrico), recorte
  * vermelho, ambiente fraco, luz fraca seguindo o mouse e a luz do neon.
  */
-export function Lights({ post }: { post: boolean }) {
+export function Lights({ post, shadowMapSize }: { post: boolean; shadowMapSize: number }) {
   const { ambient, key, rim, mouse, neon } = visual.lights;
   const camera = useThree((state) => state.camera);
   const keyLight = useRef<SpotLight>(null);
@@ -106,7 +106,7 @@ export function Lights({ post }: { post: boolean }) {
         decay={key.decay}
         target={target}
         castShadow
-        shadow-mapSize={[visual.renderer.shadowMapSize, visual.renderer.shadowMapSize]}
+        shadow-mapSize={[shadowMapSize, shadowMapSize]}
         shadow-bias={visual.renderer.shadowBias}
         shadow-normalBias={visual.renderer.shadowNormalBias}
         shadow-camera-near={visual.renderer.shadowNear}

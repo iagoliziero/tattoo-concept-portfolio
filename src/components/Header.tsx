@@ -26,20 +26,20 @@ export function Header() {
             {item.label}
           </a>
         ))}
-        <button
-          type="button"
-          className={styles.sound}
-          aria-pressed={sound}
-          aria-label={sound ? site.sound.on : site.sound.off}
-          onClick={() => {
-            if (!sound) enableSound();
-            stage.setSound(!sound);
-          }}
-        >
-          <Icon name={sound ? "volume" : "volumeOff"} size={14} />
-          <span>{site.sound.label}</span>
-        </button>
       </nav>
+      <button
+        type="button"
+        className={styles.sound}
+        aria-pressed={sound}
+        aria-label={sound ? site.sound.on : site.sound.off}
+        onClick={() => {
+          if (!sound) enableSound();
+          stage.setSound(!sound);
+        }}
+      >
+        <Icon name={sound ? "volume" : "volumeOff"} size={14} />
+        <span>{site.sound.label}</span>
+      </button>
     </header>
   );
 }

@@ -61,7 +61,7 @@ export function SessionDirector() {
     sceneState.power += ((sceneState.machineOn ? 1 : 0) - sceneState.power) * (1 - Math.exp(-dt * 6));
 
     if (running && needle.down && !stage.reducedMotion) {
-      pending.current += visual.droplets.rate * dt;
+      pending.current += (sceneState.light ? visual.lightMode.droplets : visual.droplets.rate) * dt;
       while (pending.current >= 1) {
         pending.current -= 1;
         emitDroplet(needle.x, needle.y, needle.z);

@@ -30,7 +30,7 @@ export function DrawInteraction() {
     const ray = new Raycaster();
     const ndc = new Vector2();
     const active = () => Math.abs(sceneState.p - 5) < visual.draw.activeWithin;
-    const hit = (event: PointerEvent): Hit | null => {
+    const hit = (event: { clientX: number; clientY: number }): Hit | null => {
       const arm = scene.getObjectByName("arm");
       if (!arm) return null;
       const rect = gl.domElement.getBoundingClientRect();
@@ -72,11 +72,20 @@ export function DrawInteraction() {
       stroke.current = { drawing: false, last: null };
     };
 
+    // No toque, um gesto que começa sobre a área livre desenha em vez de rolar a página.
+    const onTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      const onScene = (event.target as Element | null)?.closest?.("[data-scene]");
+      if (event.touches.length === 1 && onScene && active() && hit(touch)) event.preventDefault();
+    };
+
+    window.addEventListener("touchstart", onTouchStart, { passive: false });
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onEnd);
     window.addEventListener("pointercancel", onEnd);
     return () => {
+      window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onEnd);
@@ -93,7 +102,7 @@ export function DrawInteraction() {
     sceneState.drawing = drawing;
 
     if (drawing && !stage.reducedMotion) {
-      pending.current += visual.droplets.rate * dt;
+      pending.current += (sceneState.light ? visual.lightMode.droplets : visual.droplets.rate) * dt;
       while (pending.current >= 1) {
         pending.current -= 1;
         const tip = sceneState.drawTip;

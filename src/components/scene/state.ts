@@ -4,6 +4,8 @@ import { visual } from "@/config/visual";
 // Estado da cena, atualizado a cada quadro pelo Director e pelo CameraRig e
 // lido pelos outros componentes dentro do useFrame, sem re-render do React.
 export const sceneState = {
+  /** Modo leve (celular e telas de toque): menos efeitos e partículas. */
+  light: false,
   time: 0,
   /** stage.p suavizado: é o que move câmera, máquina e fundo. */
   p: 0,

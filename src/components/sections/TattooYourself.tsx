@@ -9,13 +9,16 @@ export function TattooYourself({ id }: { id: SectionId }) {
   const { tattoo, artist } = site;
 
   return (
-    <section id={id} data-section className={styles.section} aria-labelledby={`${id}-title`}>
+    <section id={id} data-section className={`${styles.section} ${styles.panelDownOnPhone}`} aria-labelledby={`${id}-title`}>
       <div className={`${ui.panel} ${styles.tattooPanel}`}>
         <p className={`${ui.kicker} ${ui.tight}`}>{tattoo.kicker}</p>
         <h2 id={`${id}-title`} className={`${ui.display} ${styles.tattooTitle}`}>
           {tattoo.title}
         </h2>
-        <p className={styles.small}>{tattoo.text}</p>
+        <p className={styles.small}>
+          <span className={styles.pointerText}>{tattoo.text}</span>
+          <span className={styles.touchText}>{tattoo.textTouch}</span>
+        </p>
         <TattooTools />
         <QuoteForm />
         <div className={styles.contact}>

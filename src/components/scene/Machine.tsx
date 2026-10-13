@@ -12,6 +12,7 @@ import { sceneState } from "./state";
 
 const point = new Vector3();
 const shake = new Vector3();
+const labelWidths = new WeakMap<HTMLElement, number>();
 
 /** easeOutBack: chega ao lugar passando um pouco e voltando. */
 function settle(t: number, overshoot: number) {
@@ -72,7 +73,11 @@ export function Machine() {
       root.localToWorld(point).project(camera);
       const x = (point.x * 0.5 + 0.5) * size.width;
       const y = (-point.y * 0.5 + 0.5) * size.height;
-      label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-9px, -50%)`;
+      // Perto da borda direita, a etiqueta vira para o lado esquerdo do ponto.
+      const width = (labelWidths.get(label) ?? labelWidths.set(label, label.offsetWidth).get(label))!;
+      const flip = x - 9 + width > size.width - 8;
+      label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(${flip ? "calc(9px - 100%)" : "-9px"}, -50%)`;
+      label.dataset.flip = String(flip);
       label.style.opacity = opacity.toFixed(3);
     }
   });

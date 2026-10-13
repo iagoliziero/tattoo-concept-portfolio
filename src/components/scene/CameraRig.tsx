@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { Euler, Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Vector2, Vector3, type PerspectiveCamera } from "three";
 import { visual, type Station } from "@/config/visual";
 import { stage } from "@/lib/stage";
 import { perSection, smoothstep } from "./canvas";
@@ -12,6 +12,8 @@ interface Pose {
   target: Vector3;
   machine: Vector3;
   rotation: Quaternion;
+  /** Deslocamento do assunto em retrato (painel embaixo): esquerda e cima, em frações da tela. */
+  portraitShift: Vector2;
 }
 
 const pose = (): Pose => ({
@@ -19,7 +21,11 @@ const pose = (): Pose => ({
   target: new Vector3(),
   machine: new Vector3(),
   rotation: new Quaternion(),
+  portraitShift: new Vector2(),
 });
+const screenUp = new Vector3();
+const screenRight = new Vector3();
+const shift = new Vector2();
 const euler = new Euler();
 const explodeLift = new Vector3(...visual.machine.explodeLift);
 const from = pose();
@@ -30,6 +36,8 @@ const projected = new Vector3();
 function poseAt(index: number, time: number, out: Pose) {
   const station: Station = visual.stations[index];
   const bob = Math.sin(time * visual.bob.speed) * visual.bob.amplitude;
+  out.portraitShift.set(0, 0);
+  if (station.kind !== "session" && station.portraitShift) out.portraitShift.fromArray(station.portraitShift);
 
   if (station.kind === "fixed") {
     out.camera.fromArray(station.camera);
@@ -67,9 +75,24 @@ function poseAt(index: number, time: number, out: Pose) {
 
 /** Interpola câmera e máquina (posição em smoothstep, rotação em slerp) entre as seções vizinhas de p. */
 export function CameraRig() {
-  const camera = useThree((state) => state.camera);
+  const camera = useThree((state) => state.camera) as PerspectiveCamera;
+  const size = useThree((state) => state.size);
 
   useFrame(() => {
+    // Em telas mais estreitas que a de referência (retrato), abre o campo de
+    // visão para manter a largura da cena, até o limite da config.
+    const { referenceAspect, max } = visual.responsiveFov;
+    const aspect = size.width / size.height;
+    const base = visual.camera.fov;
+    const fov =
+      aspect >= referenceAspect
+        ? base
+        : Math.min(max, (2 * Math.atan((Math.tan((base * Math.PI) / 360) * referenceAspect) / aspect) * 180) / Math.PI);
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
+
     const last = visual.stations.length - 1;
     const p = Math.min(last, Math.max(0, sceneState.p));
     const i = Math.min(last - 1, Math.floor(p));
@@ -85,6 +108,16 @@ export function CameraRig() {
     }
     sceneState.focus.lerpVectors(from.target, to.target, f);
     camera.lookAt(sceneState.focus);
+    // Retrato: move câmera e alvo juntos (para a direita e para baixo) e o
+    // assunto vai para a esquerda e para cima na tela, longe do painel.
+    shift.lerpVectors(from.portraitShift, to.portraitShift, f);
+    if (aspect < 1 && (shift.x !== 0 || shift.y !== 0)) {
+      const height = 2 * camera.position.distanceTo(sceneState.focus) * Math.tan((camera.fov * Math.PI) / 360);
+      screenRight.set(1, 0, 0).applyQuaternion(camera.quaternion).multiplyScalar(shift.x * height * aspect);
+      screenUp.set(0, 1, 0).applyQuaternion(camera.quaternion).multiplyScalar(-shift.y * height);
+      camera.position.add(screenRight).add(screenUp);
+      sceneState.focus.add(screenRight).add(screenUp);
+    }
     camera.updateMatrixWorld();
     sceneState.machine.lerpVectors(from.machine, to.machine, f);
     sceneState.machineQuat.slerpQuaternions(from.rotation, to.rotation, f);

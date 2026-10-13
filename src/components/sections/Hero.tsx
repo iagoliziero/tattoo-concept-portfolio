@@ -7,7 +7,7 @@ export function Hero({ id }: { id: SectionId }) {
   const { hero } = site;
 
   return (
-    <section id={id} data-section className={styles.section} aria-labelledby={`${id}-title`}>
+    <section id={id} data-section className={`${styles.section} ${styles.overScene}`} aria-labelledby={`${id}-title`}>
       <p className={ui.kicker}>{hero.kicker}</p>
       <h1 id={`${id}-title`} className={`${ui.display} ${styles.heroTitle}`}>
         <span>{hero.titleLines[0]}</span> <span>{hero.titleLines[1]}</span>

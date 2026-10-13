@@ -11,7 +11,7 @@ export async function About({ id }: { id: SectionId }) {
   const { value, suffix } = artist.instagram.followers;
 
   return (
-    <section id={id} data-section className={styles.section} aria-labelledby={`${id}-title`}>
+    <section id={id} data-section className={`${styles.section} ${styles.overScene}`} aria-labelledby={`${id}-title`}>
       <p className={ui.kicker}>{about.kicker}</p>
       <h2 id={`${id}-title`} className={`${ui.display} ${styles.aboutTitle}`}>
         {about.title}

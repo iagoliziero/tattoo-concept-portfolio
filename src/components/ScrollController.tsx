@@ -16,6 +16,8 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  */
 export function ScrollController() {
   useGSAP(() => {
+    // No celular, a barra de endereço que some e aparece não recalcula as seções.
+    ScrollTrigger.config({ ignoreMobileResize: true });
     const sections = gsap.utils.toArray<HTMLElement>("[data-section]");
     const { holdRatio, snapDelay, snapDuration } = visual.scroll;
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
