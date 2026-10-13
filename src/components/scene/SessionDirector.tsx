@@ -14,8 +14,8 @@ const needle = makeNeedle();
 /**
  * A sessão: começa quando a rolagem chega à seção, percorre a tatuagem com a
  * máquina ligada (push-in, balanço, gotículas) e termina sozinha se o
- * visitante sair. Também troca o dia da pele ao entrar nas seções, como o
- * protótipo: Início mostra a pele curada, Sessão mostra o Dia 0.
+ * visitante sair. O dia mostrado na pele ao entrar em cada seção fica com o
+ * SectionEffects da página.
  */
 export function SessionDirector() {
   const session = useMemo(() => createSession(SESSION_PATH.segments, SESSION_PATH.total), []);
@@ -33,8 +33,6 @@ export function SessionDirector() {
     if (section !== lastSection.current) {
       lastSection.current = section;
       if (section >= 2 && !session.started) session.finish();
-      if (section === 0) stage.setHeal(4);
-      if (section === 1) stage.setHeal(0);
     }
     if (stage.sessionReplays !== replays.current) {
       replays.current = stage.sessionReplays;

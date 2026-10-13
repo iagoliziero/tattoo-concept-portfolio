@@ -350,6 +350,8 @@ export interface VisualConfig {
   };
   /** Dia 0, 3, 7, 15 e 30, na mesma ordem dos textos em site.ts. */
   healing: readonly [HealingLayers, HealingLayers, HealingLayers, HealingLayers, HealingLayers];
+  /** Linha do tempo que corre sozinha ao entrar na seção Cura (s). */
+  healingAuto: { delay: number; duration: number };
 }
 
 export const visual = {
@@ -660,6 +662,8 @@ export const visual = {
     labelsFrom: 0.5,
     engravingBase: "#131211",
   },
+  // Protótipo: começa 0,6 s depois de entrar e avança 1,5 de 400 por quadro (~4,4 s a 60 fps).
+  healingAuto: { delay: 0.6, duration: 4.4 },
   healing: [
     { red: 0.9, blur: 0.7, gloss: 1, milk: 0, flakes: 0, ink: 1 },
     { red: 0.45, blur: 0.45, gloss: 0.35, milk: 0.06, flakes: 0.12, ink: 1 },

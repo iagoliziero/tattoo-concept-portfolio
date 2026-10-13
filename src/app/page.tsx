@@ -4,6 +4,7 @@ import { MachineLabels } from "@/components/MachineLabels";
 import { ProgressLine } from "@/components/ProgressLine";
 import { SceneLoader } from "@/components/SceneLoader";
 import { ScrollController } from "@/components/ScrollController";
+import { SectionEffects } from "@/components/SectionEffects";
 import { About } from "@/components/sections/About";
 import { Healing } from "@/components/sections/Healing";
 import { Hero } from "@/components/sections/Hero";
@@ -38,6 +39,7 @@ export default function Page() {
       </main>
       <MachineLabels />
       <ScrollController />
+      <SectionEffects />
     </>
   );
 }
