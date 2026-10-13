@@ -1,0 +1,139 @@
+/* Peças de interface reaproveitadas pelas seções (classes do protótipo). */
+
+.kicker {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--c-red);
+  margin: 0 0 10px;
+}
+
+.kicker.tight {
+  margin-bottom: 6px;
+}
+
+.kicker.snug {
+  margin-bottom: 4px;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--c-text);
+}
+
+.text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--c-text-secondary);
+  margin: 0;
+  max-width: 330px;
+}
+
+.text.compact {
+  font-size: 14px;
+}
+
+.button {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button.small {
+  height: 32px;
+  font-size: 13px;
+}
+
+.primary {
+  border: none;
+  background: var(--c-red);
+  color: var(--c-on-red);
+}
+
+.ghost {
+  background: var(--c-ghost-bg);
+  color: var(--c-text);
+  border: 0.5px solid var(--c-border);
+}
+
+.panel {
+  pointer-events: auto;
+  background: var(--c-panel-bg);
+  border: 0.5px solid var(--c-border-soft);
+  border-radius: var(--radius-panel);
+}
+
+.chip {
+  pointer-events: auto;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: var(--c-chip-bg);
+  color: var(--c-text-secondary);
+  border: 0.5px solid var(--c-border-soft);
+  cursor: pointer;
+}
+
+.tool {
+  pointer-events: auto;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--c-text-secondary);
+  border: 0.5px solid var(--c-border);
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"],
+.tool[aria-pressed="true"] {
+  background: var(--c-text);
+  color: var(--c-line);
+  border-color: var(--c-text);
+}
+
+.field {
+  pointer-events: auto;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  font-size: 14px;
+  border-radius: var(--radius);
+  background: var(--c-field-bg);
+  color: var(--c-text);
+  border: 0.5px solid var(--c-border);
+  outline: none;
+}
+
+.field:focus {
+  border-color: var(--c-red);
+}
+
+.field option {
+  background: var(--c-option-bg);
+  color: var(--c-text);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--c-error);
+  margin: 2px 0 0;
+}
+
+.error:empty {
+  display: none;
+}
