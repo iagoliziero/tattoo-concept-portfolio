@@ -3,6 +3,7 @@ import { Icon } from "../Icon";
 import ui from "../ui.module.css";
 import { QuoteForm } from "./QuoteForm";
 import styles from "./sections.module.css";
+import { TattooTools } from "./TattooTools";
 
 export function TattooYourself({ id }: { id: SectionId }) {
   const { tattoo, artist } = site;
@@ -15,17 +16,7 @@ export function TattooYourself({ id }: { id: SectionId }) {
           {tattoo.title}
         </h2>
         <p className={styles.small}>{tattoo.text}</p>
-        <div className={styles.tools} role="group" aria-label="Ferramentas de desenho">
-          <button type="button" className={ui.tool} aria-pressed={true}>
-            {tattoo.tools.line}
-          </button>
-          <button type="button" className={ui.tool} aria-pressed={false}>
-            {tattoo.tools.shade}
-          </button>
-          <button type="button" className={ui.tool}>
-            {tattoo.tools.clear}
-          </button>
-        </div>
+        <TattooTools />
         <QuoteForm />
         <div className={styles.contact}>
           <a href={artist.instagram.url} target="_blank" rel="noopener">

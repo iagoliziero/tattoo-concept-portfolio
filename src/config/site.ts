@@ -101,9 +101,12 @@ export interface SiteConfig {
       places: readonly string[];
       submit: string;
       errors: { name: string; idea: string; place: string };
+      sending: string;
+      failed: string;
       sent: string;
       sentWithDrawing: string;
       reply: string;
+      drawingAlt: string;
     };
   };
   machine: { labels: Record<LabeledPart, string> };
@@ -272,9 +275,12 @@ export const site = {
         idea: "Descreva a ideia ou desenhe no braço.",
         place: "Escolha o local do corpo.",
       },
+      sending: "Enviando…",
+      failed: "Não foi possível enviar agora. Tente de novo em instantes.",
       sent: "Pedido enviado.",
       sentWithDrawing: "Pedido enviado com seu desenho.",
       reply: "O Lucas responde em breve.",
+      drawingAlt: "Seu desenho",
     },
   },
   machine: {

@@ -9,6 +9,8 @@ import { Arm } from "./Arm";
 import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Director } from "./Director";
+import { DrawInteraction } from "./DrawInteraction";
+import { DrawSurface } from "./DrawSurface";
 import { InkMist } from "./InkMist";
 import { Dust } from "./Dust";
 import { Lights } from "./Lights";
@@ -50,6 +52,7 @@ export default function Scene() {
     >
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
       <Director />
+      <DrawInteraction />
       <SessionDirector />
       <CameraRig />
       <StudioEnvironment>
@@ -59,6 +62,7 @@ export default function Scene() {
         <Workbench />
         <Arm />
         <Tattoo />
+        <DrawSurface />
         <Machine />
         <InkMist />
         <Dust />

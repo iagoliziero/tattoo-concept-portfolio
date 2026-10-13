@@ -210,7 +210,24 @@ export interface VisualConfig {
     roughnessWet: number;
   };
   /** Igual à sessão, mais inclinada para não tampar a vista. */
-  draw: { tip: Vec3; lift: number; tilt: Vec3 };
+  draw: {
+    tip: Vec3;
+    lift: number;
+    tilt: Vec3;
+    /** Rapidez com que a agulha segue o cursor e desce na pele (1/s; protótipo: .3 e .25 por quadro). */
+    follow: number;
+    liftFollow: number;
+    /** O desenho só vale com p a esta distância da seção. */
+    activeWithin: number;
+    /** Margem das bordas da área livre: ao longo do braço (unidades) e em volta (rad). */
+    margin: { along: number; around: number };
+    line: { width: number; color: Rgba };
+    halo: { width: number; color: Rgba };
+    /** Sombra: pinceladas radiais muito transparentes a cada `spacing` pixels. */
+    shade: { radius: number; color: Rgba; spacing: number };
+    roughness: number;
+    envMapIntensity: number;
+  };
   /** Balanço vertical da máquina flutuando: amplitude e velocidade. */
   bob: { amplitude: number; speed: number };
   fog: { color: Hex; near: number; far: number };
@@ -488,7 +505,21 @@ export const visual = {
     roughnessDry: 0.5,
     roughnessWet: 0.12,
   },
-  draw: { tip: [1.85, 0, 0.2], lift: 0.18, tilt: [-0.85, 2.05, 0] },
+  // Tudo do protótipo.
+  draw: {
+    tip: [1.85, 0, 0.2],
+    lift: 0.18,
+    tilt: [-0.85, 2.05, 0],
+    follow: 21,
+    liftFollow: 17,
+    activeWithin: 0.35,
+    margin: { along: 0.04, around: 0.03 },
+    line: { width: 3.4, color: "rgba(22,17,15,.95)" },
+    halo: { width: 11, color: "rgba(190,70,55,.05)" },
+    shade: { radius: 18, color: "rgba(22,17,15,.06)", spacing: 3 },
+    roughness: 0.35,
+    envMapIntensity: 0.35,
+  },
   bob: { amplitude: 0.06, speed: 1.1 },
   fog: { color: "#0c0a09", near: 12, far: 30 },
   environment: {

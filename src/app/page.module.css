@@ -1,4 +1,13 @@
+/* O conteúdo fica por cima da cena 3D. Áreas vazias deixam o ponteiro passar
+   para a cena (desenho no braço); painéis, botões e campos ativam o ponteiro
+   neles mesmos. Os pin-spacer são os invólucros que o ScrollTrigger cria
+   em volta das seções fixas. */
 .main {
   position: relative;
   z-index: 1;
+  pointer-events: none;
+}
+
+.main :global(.pin-spacer) {
+  pointer-events: none;
 }

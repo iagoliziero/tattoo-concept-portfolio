@@ -22,7 +22,9 @@ export const sceneState = {
   machineScreen: new Vector2(...visual.backdrop.glow),
   /** Brilho do neon (1 = aceso), com as piscadas. */
   neon: 1,
-  /** Máquina ligada agora, e o mesmo suavizado de 0 a 1 (fundo, som). */
+  /** Visitante desenhando no braço (botão pressionado sobre a área livre). */
+  drawing: false,
+  /** Máquina ligada agora (sessão ou desenho), e o mesmo suavizado de 0 a 1 (fundo, som). */
   machineOn: false,
   power: 0,
   /** Ponta da agulha na sessão: crua (move a máquina) e suavizada (a câmera segue). */

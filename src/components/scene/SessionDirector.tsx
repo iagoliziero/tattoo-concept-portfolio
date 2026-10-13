@@ -56,8 +56,8 @@ export function SessionDirector() {
     const sway = running ? config.sway.amplitude * Math.sin(clock.current * config.sway.speed) : 0;
     sceneState.sessionAngle += (sway - sceneState.sessionAngle) * ease;
 
-    sceneState.machineOn = running;
-    sceneState.power += ((running ? 1 : 0) - sceneState.power) * (1 - Math.exp(-dt * 6));
+    sceneState.machineOn = running || sceneState.drawing;
+    sceneState.power += ((sceneState.machineOn ? 1 : 0) - sceneState.power) * (1 - Math.exp(-dt * 6));
 
     if (running && needle.down && !stage.reducedMotion) {
       pending.current += visual.droplets.rate * dt;

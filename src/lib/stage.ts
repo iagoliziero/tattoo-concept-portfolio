@@ -6,6 +6,7 @@ import { useSyncExternalStore } from "react";
 // `stage.p` a cada quadro; componentes React usam `useStage`.
 
 export type SessionStatus = "idle" | "running" | "done";
+export type DrawTool = "line" | "shade";
 
 export interface StageState {
   p: number;
@@ -18,6 +19,9 @@ export interface StageState {
   sessionProgress: number;
   /** Conta os pedidos de "Ver de novo"; a cena recomeça quando muda. */
   sessionReplays: number;
+  /** Ferramenta do "tatue você mesmo" e se já há algo desenhado no braço. */
+  drawTool: DrawTool;
+  hasDrawing: boolean;
 }
 
 const initial: StageState = {
@@ -28,6 +32,8 @@ const initial: StageState = {
   sessionStatus: "idle",
   sessionProgress: 0,
   sessionReplays: 0,
+  drawTool: "line",
+  hasDrawing: false,
 };
 let state: StageState = initial;
 const listeners = new Set<() => void>();
@@ -69,6 +75,12 @@ export const stage = {
   get sessionProgress() {
     return state.sessionProgress;
   },
+  get drawTool() {
+    return state.drawTool;
+  },
+  get hasDrawing() {
+    return state.hasDrawing;
+  },
   setP(p: number) {
     if (p !== state.p) set({ p, section: Math.round(p) });
   },
@@ -85,6 +97,12 @@ export const stage = {
   },
   replaySession() {
     set({ sessionReplays: state.sessionReplays + 1 });
+  },
+  setDrawTool(drawTool: DrawTool) {
+    if (drawTool !== state.drawTool) set({ drawTool });
+  },
+  setHasDrawing(hasDrawing: boolean) {
+    if (hasDrawing !== state.hasDrawing) set({ hasDrawing });
   },
   subscribe(listener: () => void) {
     listeners.add(listener);

@@ -27,7 +27,7 @@ export function Arm() {
   );
 
   return (
-    <mesh rotation-z={Math.PI / 2} position-y={-ARM_RADIUS} receiveShadow renderOrder={1}>
+    <mesh name="arm" rotation-z={Math.PI / 2} position-y={-ARM_RADIUS} receiveShadow renderOrder={1}>
       <cylinderGeometry args={[ARM_RADIUS, ARM_RADIUS, ARM_LENGTH, 128, 1, true, ARM_THETA_START, ARM_SPAN]} />
       <meshStandardMaterial
         map={map}

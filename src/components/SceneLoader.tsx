@@ -8,7 +8,7 @@ const Scene = dynamic(() => import("./scene/Scene"), { ssr: false });
 
 export function SceneLoader() {
   return (
-    <div className={styles.stage} aria-hidden="true">
+    <div className={styles.stage} aria-hidden="true" data-scene>
       <Scene />
     </div>
   );
