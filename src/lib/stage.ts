@@ -20,7 +20,20 @@ function set(next: Partial<StageState>) {
   listeners.forEach((listener) => listener());
 }
 
+// prefers-reduced-motion, acompanhando mudanças do sistema enquanto a página está aberta.
+let reducedMotion: MediaQueryList | null = null;
+function reducedMotionQuery() {
+  if (!reducedMotion && typeof window !== "undefined") {
+    reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  }
+  return reducedMotion;
+}
+
 export const stage = {
+  /** Sem vibração, tremores, piscadas e derivas. */
+  get reducedMotion() {
+    return reducedMotionQuery()?.matches ?? false;
+  },
   get p() {
     return state.p;
   },

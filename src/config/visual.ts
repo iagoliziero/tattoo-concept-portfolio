@@ -31,6 +31,22 @@ export interface MaterialParams {
   bumpScale?: number;
 }
 
+/**
+ * Cor de luz. "srgb" é convertida para linear, como o Lc() do protótipo.
+ * "linear" é usada direto: o protótipo passava hex numérico ao three r128,
+ * que não convertia, e o three atual converteria.
+ */
+export interface LightColor {
+  hex: Hex;
+  space: "srgb" | "linear";
+}
+
+/** Câmera e máquina de uma seção. A sessão e o "tatue você" seguem a agulha. */
+export type Station =
+  | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3 }
+  | { kind: "session" }
+  | { kind: "draw"; camera: Vec3; target: Vec3 };
+
 /** Peso de cada camada da cicatrização num estágio (0 a 1). */
 export interface HealingLayers {
   /** vermelhidão */
@@ -102,20 +118,121 @@ export interface VisualConfig {
     shadowMapSize: number;
     shadowBias: number;
     shadowNormalBias: number;
+    shadowNear: number;
+    shadowFar: number;
   };
-  camera: { fov: number; near: number; far: number };
+  camera: {
+    fov: number;
+    near: number;
+    far: number;
+    /** Rapidez com que câmera e cena seguem a rolagem (1/s). */
+    follow: number;
+  };
+  /** Ponto de vista de cada seção, na ordem da navegação. */
+  stations: readonly [Station, Station, Station, Station, Station, Station];
+  session: {
+    /** Onde a agulha espera antes de começar, em coordenadas do desenho. */
+    start: readonly [number, number];
+    zoom: number;
+    /** Afastamento lateral e frontal da câmera em relação à agulha. */
+    orbit: readonly [number, number];
+    targetOffset: Vec3;
+    lift: number;
+  };
+  draw: { tip: Vec3; lift: number };
+  /** Balanço vertical da máquina flutuando: amplitude e velocidade. */
+  bob: { amplitude: number; speed: number };
   fog: { color: Hex; near: number; far: number };
+  environment: {
+    /**
+     * Cor de fundo do estúdio, linear. O código do protótipo pedia #070606, mas
+     * no three r128 esse fundo saía como um cinza claro e uniforme, e é esse
+     * cinza que deixa os metais prateados e a bancada clara no visual aprovado.
+     * Para um ambiente escuro, com reflexo só dos painéis, use valores perto de 0.
+     */
+    fill: Vec3;
+    blur: number;
+    /** Painéis de luz que viram o reflexo dos metais (cores lineares, HDR). */
+    panels: readonly { size: readonly [number, number]; rgb: Vec3; position: Vec3 }[];
+  };
+  backdrop: {
+    /** Posição padrão do brilho, em fração da tela (x, y a partir de baixo). */
+    glow: readonly [number, number];
+    redBase: number;
+    /** Vermelho extra na última seção. */
+    redAtEnd: number;
+    /** Deslocamento da fumaça com o mouse e com a rolagem. */
+    parallax: { mouse: number; scroll: number };
+  };
   lights: {
-    ambient: { color: Hex; intensity: number };
+    ambient: { color: LightColor; intensity: number };
     key: {
-      color: Hex;
+      color: LightColor;
       intensity: number;
       distance: number;
       angle: number;
       penumbra: number;
       decay: number;
+      /** Posição em relação ao ponto para onde a câmera olha. */
+      offset: Vec3;
+    };
+    rim: { color: LightColor; intensity: number; position: Vec3 };
+    mouse: {
+      color: LightColor;
+      intensity: number;
+      distance: number;
+      decay: number;
+      /** Distância da câmera até a luz, na direção do cursor. */
+      reach: number;
+      /** Força em cada seção (quase apagada nos closes). */
+      perSection: readonly [number, number, number, number, number, number];
+    };
+    neon: { color: LightColor; intensity: number; distance: number; decay: number; position: Vec3 };
+  };
+  neon: {
+    position: Vec3;
+    rotationY: number;
+    size: readonly [number, number];
+    /** Multiplicador de cor acima de 1, para o bloom pegar. */
+    glow: number;
+    canvas: readonly [number, number];
+    flicker: {
+      /** Sorteios de piscada por segundo. */
+      rate: number;
+      /** Chance de apagar em cada sorteio. */
+      chance: number;
+      /** Brilho mínimo e máximo durante uma piscada. */
+      dim: readonly [number, number];
+      /** Oscilação leve do brilho aceso. */
+      hum: number;
     };
   };
+  beam: { length: number; radiusRatio: number; intensity: number };
+  dust: { count: number; size: number; color: Hex; opacity: number; min: Vec3; max: Vec3 };
+  arm: {
+    radius: number;
+    length: number;
+    /** Abertura do segmento de cilindro, em radianos. */
+    span: number;
+    skin: Hex;
+    roughness: number;
+    bumpScale: number;
+    envMapIntensity: number;
+    textureWidth: number;
+    tattoo: { span: number; length: number; textureWidth: number };
+    drawArea: { center: number; length: number; textureWidth: number };
+  };
+  table: {
+    y: number;
+    size: number;
+    roughness: number;
+    clearcoat: number;
+    clearcoatRoughness: number;
+    envMapIntensity: number;
+    repeat: readonly [number, number];
+  };
+  inkCaps: readonly { position: readonly [number, number]; ink: Hex }[];
+  bottles: readonly (readonly [number, number])[];
   post: {
     msaaSamples: number;
     bloom: { strength: number; radius: number; threshold: number };
@@ -191,22 +308,132 @@ export const visual = {
     shadowMapSize: 2048,
     shadowBias: -0.0003,
     shadowNormalBias: 0.02,
+    shadowNear: 2,
+    shadowFar: 30,
   },
-  camera: { fov: 38, near: 0.03, far: 80 },
+  camera: { fov: 38, near: 0.03, far: 80, follow: 3.7 },
+  stations: [
+    { kind: "fixed", camera: [0, 2.3, 7.4], target: [0.9, 2.1, 0], machine: [1.9, 0.5, 0.3] },
+    { kind: "session" },
+    { kind: "fixed", camera: [-0.75, 3.1, 1.7], target: [-0.75, -0.1, 0.15], machine: [1.7, 1.3, -1.6] },
+    { kind: "fixed", camera: [0.6, 4.4, 5.6], target: [0.7, 0.2, 0], machine: [3, 1.1, -1.4] },
+    { kind: "fixed", camera: [0, 2.5, 8.4], target: [1.3, 2.4, 0], machine: [2.3, 0.55, 0] },
+    { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1] },
+  ],
+  session: {
+    start: [0, 0.3],
+    zoom: 1.35,
+    orbit: [1.25, 1.7],
+    targetOffset: [0, 0.26, -0.1],
+    lift: 0.16,
+  },
+  draw: { tip: [1.85, 0, 0.2], lift: 0.18 },
+  bob: { amplitude: 0.06, speed: 1.1 },
   fog: { color: "#0c0a09", near: 12, far: 30 },
+  environment: {
+    fill: [0.66, 0.645, 0.64],
+    blur: 0.035,
+    panels: [
+      { size: [8, 2.5], rgb: [6, 5.6, 5.2], position: [0, 9, 1] },
+      { size: [1.5, 9], rgb: [4.5, 0.5, 0.42], position: [-8, 1, -1] },
+      { size: [2, 7], rgb: [4, 3, 2.2], position: [8, 2, 3] },
+      { size: [7, 1.5], rgb: [0.6, 0.6, 0.6], position: [0, 2, -9] },
+      { size: [3, 3], rgb: [1.2, 1.1, 1], position: [4, -6, 4] },
+    ],
+  },
+  backdrop: {
+    glow: [0.7, 0.55],
+    redBase: 0.2,
+    redAtEnd: 0.55,
+    parallax: { mouse: 0.06, scroll: 0.1 },
+  },
   lights: {
-    // Intensidades do three r128 (luzes legadas). No three atual as luzes são
-    // físicas: a fase 2 recalibra estes valores comparando com o protótipo.
-    ambient: { color: "#ffe8d6", intensity: 0.22 },
+    // O protótipo usava as luzes legadas do three r128 (queda linear com a
+    // distância). Aqui as luzes são físicas: intensidades multiplicadas por pi
+    // e decay escolhido para a queda física reproduzir a curva antiga entre a
+    // distância de trabalho e o fundo da cena; conferido renderizando os dois
+    // lado a lado. Valores originais (intensidade/decay): ambiente .22,
+    // principal 2.8/1, recorte 1.3, mouse .7/2, neon 2.5/1.5.
+    ambient: { color: { hex: "#ffe8d6", space: "srgb" }, intensity: 0.69 },
     key: {
-      color: "#fff0dd",
-      intensity: 2.8,
+      color: { hex: "#fff0dd", space: "linear" },
+      intensity: 16.3,
       distance: 40,
       angle: 0.55,
       penumbra: 0.65,
+      decay: 0.4,
+      offset: [1.6, 7.5, 3.2],
+    },
+    rim: { color: { hex: "#E24B4A", space: "srgb" }, intensity: 4.08, position: [-5, 3, -4] },
+    mouse: {
+      color: { hex: "#fff6ee", space: "linear" },
+      intensity: 3.14,
+      distance: 6,
+      decay: 1.5,
+      reach: 3,
+      perSection: [1, 0.12, 0.35, 1, 1, 0.12],
+    },
+    neon: {
+      color: { hex: "#ff4a40", space: "srgb" },
+      intensity: 25.1,
+      distance: 16,
       decay: 1,
+      position: [3.8, 4.2, -8],
     },
   },
+  neon: {
+    position: [3.8, 4.4, -9],
+    rotationY: -0.15,
+    size: [4.4, 1.375],
+    glow: 2.2,
+    canvas: [1024, 320],
+    flicker: { rate: 8, chance: 0.015, dim: [0.25, 0.6], hum: 0.06 },
+  },
+  beam: { length: 12, radiusRatio: 0.28, intensity: 0.09 },
+  dust: {
+    count: 420,
+    size: 0.03,
+    color: "#FAC775",
+    opacity: 0.6,
+    min: [-5, -1, -5],
+    max: [5, 5, 4],
+  },
+  arm: {
+    radius: 2,
+    length: 7,
+    span: 2.4,
+    skin: "#c48867",
+    roughness: 0.66,
+    bumpScale: 0.0015,
+    envMapIntensity: 0.25,
+    textureWidth: 768,
+    tattoo: { span: 1.44, length: 2, textureWidth: 880 },
+    drawArea: { center: 1.85, length: 1.4, textureWidth: 800 },
+  },
+  table: {
+    y: -1,
+    size: 40,
+    roughness: 0.48,
+    clearcoat: 0.35,
+    clearcoatRoughness: 0.25,
+    // 1 no protótipo. O reflexo rasante do verniz saía mais forte no r128;
+    // 1.2 equilibra a bancada ao fundo (planos abertos) e vista de cima,
+    // medido lado a lado.
+    envMapIntensity: 1.2,
+    repeat: [3, 6],
+  },
+  inkCaps: [
+    { position: [-2.4, -3.3], ink: "#141210" },
+    { position: [-2.05, -3], ink: "#141210" },
+    { position: [-1.75, -3.4], ink: "#5F5E5A" },
+    { position: [-1.45, -3.05], ink: "#141210" },
+    { position: [-1.15, -3.45], ink: "#888780" },
+    { position: [-1.9, -3.75], ink: "#2C2C2A" },
+  ],
+  bottles: [
+    [-0.6, -3.4],
+    [-0.2, -3.05],
+  ],
   post: {
     msaaSamples: 4,
     bloom: { strength: 0.5, radius: 0.5, threshold: 0.88 },

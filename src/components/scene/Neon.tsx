@@ -1,0 +1,53 @@
+"use client";
+
+import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { AdditiveBlending, type MeshBasicMaterial } from "three";
+import { site } from "@/config/site";
+import { visual } from "@/config/visual";
+import { canvasTexture, makeCanvas } from "./canvas";
+import { sceneState } from "./state";
+import { drawNeon } from "./textures";
+
+/** Letreiro "Lucas" atrás da máquina, sem tone mapping para o bloom pegar. */
+export function Neon() {
+  const { position, rotationY, size, glow, canvas: canvasSize } = visual.neon;
+  const material = useRef<MeshBasicMaterial>(null);
+  const { canvas, texture } = useMemo(() => {
+    const canvas = makeCanvas(...canvasSize);
+    return { canvas, texture: canvasTexture(canvas, { srgb: true }) };
+  }, [canvasSize]);
+
+  useEffect(() => {
+    // A Pirata One vem do next/font com outro nome de família: lemos o nome
+    // real da variável CSS e redesenhamos quando a fonte terminar de carregar.
+    const family =
+      getComputedStyle(document.documentElement).getPropertyValue("--font-display-face").trim() || "serif";
+    const draw = () => {
+      drawNeon(canvas, family, site.scene.neonTitle, site.scene.neonSubtitle);
+      texture.needsUpdate = true;
+    };
+    draw();
+    document.fonts.load(`150px ${family}`).then(draw, () => {});
+    return () => texture.dispose();
+  }, [canvas, texture]);
+
+  useFrame(() => {
+    material.current?.color.setScalar(glow * sceneState.neon);
+  });
+
+  return (
+    <mesh position={position} rotation-y={rotationY}>
+      <planeGeometry args={size} />
+      <meshBasicMaterial
+        ref={material}
+        map={texture}
+        transparent
+        depthWrite={false}
+        blending={AdditiveBlending}
+        toneMapped={false}
+        fog={false}
+      />
+    </mesh>
+  );
+}

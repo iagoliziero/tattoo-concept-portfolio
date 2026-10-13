@@ -107,7 +107,8 @@ export interface SiteConfig {
     };
   };
   machine: { labels: Record<LabeledPart, string> };
-  neon: { title: string; subtitle: string };
+  /** Textos que aparecem dentro da cena 3D. */
+  scene: { neonTitle: string; neonSubtitle: string; bottleLabel: string };
 }
 
 const artist = {
@@ -284,5 +285,9 @@ export const site = {
       arm: "Armadura e molas",
     },
   },
-  neon: { title: "Lucas", subtitle: "black & gray · realismo" },
+  scene: {
+    neonTitle: "Lucas",
+    neonSubtitle: "black & gray · realismo",
+    bottleLabel: "Black ink",
+  },
 } as const satisfies SiteConfig;
