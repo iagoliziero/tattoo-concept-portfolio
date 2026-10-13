@@ -70,13 +70,13 @@ export function Backdrop() {
   );
 
   useFrame(() => {
-    const { redBase, redAtEnd, parallax } = visual.backdrop;
+    const { redBase, redAtEnd, redWhenOn, parallax } = visual.backdrop;
     const { mouse, p } = sceneState;
     uniforms.uT.value = sceneState.time;
     uniforms.uR.value.set(size.width, size.height);
     uniforms.uO.value.set(mouse.x * parallax.mouse + p * parallax.scroll, -mouse.y * parallax.mouse);
     uniforms.uL.value.copy(sceneState.machineScreen);
-    uniforms.uRed.value = redBase + redAtEnd * smoothstep(3.5, 5, p);
+    uniforms.uRed.value = redBase + redAtEnd * smoothstep(3.5, 5, p) + redWhenOn * sceneState.power;
   });
 
   return (

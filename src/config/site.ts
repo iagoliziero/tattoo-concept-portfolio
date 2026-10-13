@@ -60,7 +60,7 @@ export interface SiteConfig {
     kicker: string;
     title: string;
     text: string;
-    idleStatus: string;
+    status: { idle: string; running: string; done: string };
     replay: string;
   };
   healing: {
@@ -158,7 +158,7 @@ export const site = {
     kicker: "02 · A sessão",
     title: "Cada sombra conta",
     text: "Material estéril, técnica apurada e paciência para cada detalhe.",
-    idleStatus: "Máquina em espera",
+    status: { idle: "Máquina em espera", running: "Tatuando…", done: "Sessão concluída" },
     replay: "Ver de novo",
   },
   healing: {

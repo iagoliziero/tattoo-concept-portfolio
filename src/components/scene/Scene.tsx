@@ -4,15 +4,19 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import * as THREE from "three";
 import { visual } from "@/config/visual";
+import { stage } from "@/lib/stage";
 import { Arm } from "./Arm";
 import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Director } from "./Director";
+import { InkMist } from "./InkMist";
 import { Dust } from "./Dust";
 import { Lights } from "./Lights";
 import { Machine } from "./Machine";
 import { Neon } from "./Neon";
+import { SessionDirector } from "./SessionDirector";
 import { StudioEnvironment } from "./StudioEnvironment";
+import { Tattoo } from "./Tattoo";
 import { sceneState } from "./state";
 import { Workbench } from "./Workbench";
 
@@ -22,7 +26,7 @@ function DevHandle() {
   const camera = useThree((state) => state.camera);
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
-    w.__scene = { scene, camera, state: sceneState, THREE };
+    w.__scene = { scene, camera, state: sceneState, stage, THREE };
     return () => {
       delete w.__scene;
     };
@@ -46,6 +50,7 @@ export default function Scene() {
     >
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
       <Director />
+      <SessionDirector />
       <CameraRig />
       <StudioEnvironment>
         <Backdrop />
@@ -53,7 +58,9 @@ export default function Scene() {
         <Neon />
         <Workbench />
         <Arm />
+        <Tattoo />
         <Machine />
+        <InkMist />
         <Dust />
       </StudioEnvironment>
       {process.env.NODE_ENV === "development" && <DevHandle />}

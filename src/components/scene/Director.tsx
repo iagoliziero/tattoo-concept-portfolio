@@ -30,6 +30,7 @@ export function Director() {
     const [along, around] = visual.session.start;
     surfacePoint(along, around, tip);
     sceneState.sessionTip.set(tip.x, tip.y, tip.z);
+    sceneState.sessionFocus.copy(sceneState.sessionTip);
 
     const onMove = (event: PointerEvent) => {
       if (event.pointerType === "touch") return;

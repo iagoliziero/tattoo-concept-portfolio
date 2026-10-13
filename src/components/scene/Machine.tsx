@@ -7,10 +7,11 @@ import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
 import { smoothstep } from "./canvas";
 import { LABELED_PARTS, machineLabels } from "./labels";
-import { buildMachine, MACHINE_PARTS } from "./machineModel";
+import { buildMachine, MACHINE_PARTS, NEEDLE_REST_Y } from "./machineModel";
 import { sceneState } from "./state";
 
 const point = new Vector3();
+const shake = new Vector3();
 
 /** easeOutBack: chega ao lugar passando um pouco e voltando. */
 function settle(t: number, overshoot: number) {
@@ -49,6 +50,14 @@ export function Machine() {
       group.position.set(fx * away + ex * w, fy * away + ey * w, fz * away + ez * w);
       group.rotation.y = assembly.spin * away;
     }
+
+    // Ligada: agulha oscilando, armadura tremendo e a máquina inteira vibrando.
+    const on = sceneState.machineOn && !stage.reducedMotion;
+    const { needle, armature, jitter } = visual.vibration;
+    const phase = sceneState.time * Math.PI * 2;
+    model.needle.position.y = NEEDLE_REST_Y - (on ? needle.reach + Math.sin(phase * needle.rate) * needle.amplitude : 0);
+    model.armature.rotation.z = on ? Math.sin(phase * armature.rate) * armature.angle : 0;
+    if (on) root.position.add(shake.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(jitter));
 
     root.updateMatrixWorld();
     const opacity = smoothstep(labelsFrom, 1, w);

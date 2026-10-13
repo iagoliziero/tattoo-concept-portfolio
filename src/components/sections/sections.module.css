@@ -87,6 +87,28 @@
   background: var(--c-border);
 }
 
+.led[data-status="running"] {
+  background: var(--c-red);
+  box-shadow: 0 0 6px var(--c-red);
+  animation: led-blink var(--led-period) steps(2, jump-none) infinite;
+}
+
+.led[data-status="done"] {
+  background: var(--c-success);
+}
+
+@keyframes led-blink {
+  to {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .led[data-status="running"] {
+    animation: none;
+  }
+}
+
 .meter {
   height: 2px;
   margin-top: 8px;
@@ -94,14 +116,19 @@
 }
 
 .meterFill {
-  width: 0;
   height: 100%;
   background: var(--c-red);
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 .replay {
   margin-top: 10px;
   visibility: hidden;
+}
+
+.replay[data-shown="true"] {
+  visibility: visible;
 }
 
 /* Ciclo de vida */

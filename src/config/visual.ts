@@ -146,15 +146,68 @@ export interface VisualConfig {
   /** Ponto de vista de cada seção, na ordem da navegação. */
   stations: readonly [Station, Station, Station, Station, Station, Station];
   session: {
-    /** Onde a agulha espera antes de começar, em coordenadas do desenho. */
+    /** Onde a agulha espera antes de começar e onde para no fim (coordenadas do desenho). */
     start: readonly [number, number];
+    end: readonly [number, number];
+    /** Velocidade da agulha percorrendo um traço (unidades/s). */
+    speed: number;
+    /** Tempo de um deslocamento entre traços: base + distância x perUnit (s). */
+    travel: { base: number; perUnit: number };
+    /** Altura da agulha fora da pele e tempo para subir/descer (s). */
+    lift: number;
+    liftTime: number;
+    /** Afastamento da câmera parada e com a máquina ligada (push-in). */
     zoom: number;
+    zoomActive: number;
+    /** Rapidez da aproximação e do afastamento (1/s). */
+    zoomFollow: number;
     /** Afastamento lateral e frontal da câmera em relação à agulha. */
     orbit: readonly [number, number];
+    /** Balanço da câmera em volta da agulha durante a sessão (rad, rad/s). */
+    sway: { amplitude: number; speed: number };
     targetOffset: Vec3;
-    lift: number;
+    /** Rapidez com que a câmera segue a agulha (1/s; protótipo: .08 por quadro). */
+    tipFollow: number;
+    /** Começa quando p chega a esta distância da seção; termina sozinha ao sair desta. */
+    startWithin: number;
+    leaveBeyond: number;
+    /** Piscadas por segundo do LED com a máquina ligada. */
+    ledBlink: number;
     /** Inclinação da máquina tatuando (radianos, ordem XYZ). */
     tilt: Vec3;
+  };
+  /** Máquina ligada. Desligado com prefers-reduced-motion. */
+  vibration: {
+    /** Agulha: desce `reach` para fora da biqueira e oscila (unidades, Hz). */
+    needle: { amplitude: number; rate: number; reach: number };
+    armature: { angle: number; rate: number };
+    /** Tremor da máquina inteira e da câmera (unidades da cena). */
+    jitter: number;
+    cameraTremor: number;
+  };
+  /** Gotículas de tinta saindo da agulha. */
+  droplets: {
+    capacity: number;
+    /** Por segundo, com a agulha na pele. */
+    rate: number;
+    life: number;
+    /** Velocidade lateral e de subida (mín., máx.) e gravidade. */
+    spread: readonly [number, number];
+    rise: readonly [number, number];
+    gravity: number;
+    /** Tamanho em pixels a 1 unidade da câmera. */
+    size: number;
+  };
+  tattoo: {
+    /** Traço: linha escura com sombra curta e um halo avermelhado largo. */
+    line: { width: number; color: Rgba; shadow: Rgba; blur: number };
+    halo: { width: number; color: Rgba };
+    roughness: number;
+    clearcoatRoughness: number;
+    envMapIntensity: number;
+    /** Rugosidade seca e com pomada (o brilho de pomada interpola entre as duas). */
+    roughnessDry: number;
+    roughnessWet: number;
   };
   /** Igual à sessão, mais inclinada para não tampar a vista. */
   draw: { tip: Vec3; lift: number; tilt: Vec3 };
@@ -177,8 +230,9 @@ export interface VisualConfig {
     /** Posição padrão do brilho, em fração da tela (x, y a partir de baixo). */
     glow: readonly [number, number];
     redBase: number;
-    /** Vermelho extra na última seção. */
+    /** Vermelho extra na última seção e com a máquina ligada. */
     redAtEnd: number;
+    redWhenOn: number;
     /** Deslocamento da fumaça com o mouse e com a rolagem. */
     parallax: { mouse: number; scroll: number };
   };
@@ -387,13 +441,50 @@ export const visual = {
     },
     { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1] },
   ],
+  // Percurso, velocidade, alturas, zoom parado e inclinação: protótipo.
+  // Push-in, balanço, rapidez do zoom e LED: definidos aqui.
   session: {
     start: [0, 0.3],
-    zoom: 1.35,
-    orbit: [1.25, 1.7],
-    targetOffset: [0, 0.26, -0.1],
+    end: [0.45, 0.5],
+    speed: 1.6,
+    travel: { base: 0.16, perUnit: 0.25 },
     lift: 0.16,
+    liftTime: 0.08,
+    zoom: 1.35,
+    zoomActive: 0.95,
+    zoomFollow: 1.4,
+    orbit: [1.25, 1.7],
+    sway: { amplitude: 0.22, speed: 0.35 },
+    targetOffset: [0, 0.26, -0.1],
+    tipFollow: 5,
+    startWithin: 0.05,
+    leaveBeyond: 0.5,
+    ledBlink: 3,
     tilt: [-0.45, 2.05, 0],
+  },
+  vibration: {
+    needle: { amplitude: 0.03, rate: 19, reach: 0.03 },
+    armature: { angle: 0.03, rate: 19 },
+    jitter: 0.004,
+    cameraTremor: 0.004,
+  },
+  droplets: {
+    capacity: 240,
+    rate: 70,
+    life: 0.55,
+    spread: [0.05, 0.3],
+    rise: [0.15, 0.45],
+    gravity: 1.6,
+    size: 7,
+  },
+  tattoo: {
+    line: { width: 3, color: "rgba(24,17,15,.96)", shadow: "rgba(25,16,14,.6)", blur: 2.5 },
+    halo: { width: 10, color: "rgba(190,70,55,.05)" },
+    roughness: 0.4,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 0.4,
+    roughnessDry: 0.5,
+    roughnessWet: 0.12,
   },
   draw: { tip: [1.85, 0, 0.2], lift: 0.18, tilt: [-0.85, 2.05, 0] },
   bob: { amplitude: 0.06, speed: 1.1 },
@@ -413,6 +504,7 @@ export const visual = {
     glow: [0.7, 0.55],
     redBase: 0.2,
     redAtEnd: 0.55,
+    redWhenOn: 0.35,
     parallax: { mouse: 0.06, scroll: 0.1 },
   },
   lights: {

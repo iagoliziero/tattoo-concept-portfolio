@@ -22,6 +22,8 @@ import { canvasTexture, makeCanvas } from "./canvas";
 // agulha na origem e tubo apontando para +Y. Medidas em unidades da cena.
 
 export const MACHINE_PARTS: readonly MachinePart[] = ["tip", "grip", "tube", "frame", "coil", "arm"];
+/** Altura do centro da agulha parada, escondida dentro da biqueira. */
+export const NEEDLE_REST_Y = 0.26;
 
 export interface MachineModel {
   root: Group;
@@ -248,7 +250,7 @@ export function buildMachine(): MachineModel {
   const flat = Math.PI / 2;
 
   // Biqueira e agulha
-  const needle = add("tip", cylinder(0.006, 0.006, 0.4, 10), m.chrome, [0, 0.26, 0]);
+  const needle = add("tip", cylinder(0.006, 0.006, 0.4, 10), m.chrome, [0, NEEDLE_REST_Y, 0]);
   add(
     "tip",
     lathe([

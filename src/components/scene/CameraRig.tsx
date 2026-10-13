@@ -43,7 +43,7 @@ function poseAt(index: number, time: number, out: Pose) {
     out.rotation.setFromEuler(euler);
   } else if (station.kind === "session") {
     const { orbit, targetOffset } = visual.session;
-    const tip = sceneState.sessionTip;
+    const tip = sceneState.sessionFocus;
     const zoom = sceneState.sessionZoom;
     const c = Math.cos(sceneState.sessionAngle);
     const s = Math.sin(sceneState.sessionAngle);
@@ -53,7 +53,7 @@ function poseAt(index: number, time: number, out: Pose) {
       tip.z + (-orbit[0] * s + orbit[1] * c) * zoom,
     );
     out.target.copy(tip).add(projected.fromArray(targetOffset));
-    out.machine.copy(tip);
+    out.machine.copy(sceneState.sessionTip);
     out.machine.y += sceneState.sessionLift;
     out.rotation.setFromEuler(euler.set(...visual.session.tilt, "XYZ"));
   } else {
@@ -78,6 +78,11 @@ export function CameraRig() {
     poseAt(i + 1, sceneState.time, to);
 
     camera.position.lerpVectors(from.camera, to.camera, f);
+    if (sceneState.machineOn && !stage.reducedMotion) {
+      const tremor = visual.vibration.cameraTremor;
+      camera.position.x += (Math.random() - 0.5) * tremor;
+      camera.position.y += (Math.random() - 0.5) * tremor;
+    }
     sceneState.focus.lerpVectors(from.target, to.target, f);
     camera.lookAt(sceneState.focus);
     camera.updateMatrixWorld();
