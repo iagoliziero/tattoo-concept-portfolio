@@ -208,8 +208,21 @@
   list-style: none;
 }
 
+.cardItem {
+  transition: opacity 0.3s;
+}
+
+.cardItem[data-dimmed="true"] {
+  opacity: 0.15;
+}
+
 .card {
   pointer-events: auto;
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
   padding: 8px;
   background: var(--c-card-bg);
   border: 0.5px solid var(--c-border-soft);
@@ -220,8 +233,13 @@
     opacity 0.3s;
 }
 
-.card:hover {
+.card:hover,
+.card:focus-visible {
   border-color: var(--c-red);
+}
+
+button.card {
+  cursor: pointer;
 }
 
 .cardPhoto {
@@ -271,13 +289,34 @@
   border-color: var(--c-border-soft);
 }
 
+.reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--reveal-duration, 0.9s) ease var(--reveal-delay, 0s);
+}
+
+.grid[data-revealed="false"] .reveal {
+  clip-path: inset(100% 0 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transition: none;
+  }
+}
+
 .photo {
   object-fit: cover;
   filter: grayscale(1) contrast(1.08);
   transition: filter 0.4s;
 }
 
-.card:hover .photo {
+.card:hover .photo,
+.card:focus-visible .photo {
   filter: grayscale(0.15) contrast(1.05);
 }
 
@@ -413,4 +452,45 @@
   gap: 5px;
   color: inherit;
   text-decoration: none;
+}
+
+/* Lightbox do portfólio */
+
+.lightbox {
+  width: min(92vw, 880px);
+  max-height: 92vh;
+  padding: 16px;
+  color: var(--c-text);
+  background: var(--c-panel-bg);
+  border: 0.5px solid var(--c-border-soft);
+  border-radius: var(--radius-panel);
+}
+
+.lightbox::backdrop {
+  background: rgba(9, 8, 7, 0.82);
+}
+
+.lightboxFigure {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.lightboxImage {
+  position: relative;
+  height: min(70vh, 640px);
+}
+
+.lightboxImage img {
+  object-fit: contain;
+}
+
+.lightboxTitle {
+  margin: 0;
+  font-size: 26px;
+}
+
+.lightboxClose {
+  align-self: flex-end;
 }

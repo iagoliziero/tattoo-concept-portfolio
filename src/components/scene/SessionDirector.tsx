@@ -3,6 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { visual } from "@/config/visual";
+import { setBuzz } from "@/lib/sound";
 import { stage } from "@/lib/stage";
 import { emitDroplet } from "./InkMist";
 import { createSession, makeNeedle } from "./session";
@@ -68,6 +69,7 @@ export function SessionDirector() {
     }
 
     stage.setSession(running ? "running" : session.done ? "done" : "idle", session.progress);
+    setBuzz(stage.sound && sceneState.machineOn);
   }, -1.5);
 
   return null;

@@ -1,0 +1,41 @@
+.ring,
+.dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.ring {
+  border: 1px solid var(--c-text);
+  transition:
+    border-color 0.2s,
+    opacity 0.2s;
+}
+
+.ring[data-over="true"] {
+  border-color: var(--c-red);
+}
+
+.dot {
+  background: var(--c-red);
+}
+
+/* Com o cursor próprio ativo, esconde o do sistema (menos nos campos de texto). */
+.active,
+.active * {
+  cursor: none !important;
+}
+
+.active :is(input, textarea) {
+  cursor: text !important;
+}
+
+.active .ring,
+.active .dot {
+  opacity: 1;
+}

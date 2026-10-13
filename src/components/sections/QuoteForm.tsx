@@ -6,6 +6,7 @@ import { site } from "@/config/site";
 import { visual } from "@/config/visual";
 import { drawingBlob, drawingDataUrl } from "@/lib/drawing";
 import { sendQuote } from "@/lib/quote";
+import { splat } from "../InkSplashes";
 import { stage } from "@/lib/stage";
 import ui from "../ui.module.css";
 import styles from "./sections.module.css";
@@ -29,6 +30,7 @@ export function QuoteForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const button = event.currentTarget.querySelector("button[type=submit]");
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const idea = String(data.get("idea") ?? "").trim();
@@ -51,6 +53,8 @@ export function QuoteForm() {
       const thumbnail = drawingDataUrl();
       await sendQuote({ name, idea, place, drawing: await drawingBlob() });
       setStatus({ kind: "sent", thumbnail });
+      const r = button?.getBoundingClientRect();
+      if (r) splat(r.left + r.width / 2, r.top + r.height / 2, visual.splash.onSubmit);
     } catch (error) {
       console.error(error);
       setStatus({ kind: "failed" });

@@ -1,5 +1,7 @@
 import type { ComponentType } from "react";
+import { Cursor } from "@/components/Cursor";
 import { Header } from "@/components/Header";
+import { InkSplashes } from "@/components/InkSplashes";
 import { MachineLabels } from "@/components/MachineLabels";
 import { ProgressLine } from "@/components/ProgressLine";
 import { SceneLoader } from "@/components/SceneLoader";
@@ -40,6 +42,8 @@ export default function Page() {
       <MachineLabels />
       <ScrollController />
       <SectionEffects />
+      <InkSplashes />
+      <Cursor />
     </>
   );
 }

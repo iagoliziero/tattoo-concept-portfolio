@@ -49,7 +49,7 @@ void main() {
  * Spot quente seguindo o foco da câmera (com o feixe volumétrico), recorte
  * vermelho, ambiente fraco, luz fraca seguindo o mouse e a luz do neon.
  */
-export function Lights() {
+export function Lights({ post }: { post: boolean }) {
   const { ambient, key, rim, mouse, neon } = visual.lights;
   const camera = useThree((state) => state.camera);
   const keyLight = useRef<SpotLight>(null);
@@ -68,10 +68,10 @@ export function Lights() {
   const beamUniforms = useMemo(
     () => ({
       uT: { value: 0 },
-      uI: { value: visual.beam.intensity },
+      uI: { value: visual.beam.intensity * (post ? visual.post.beamScale : 1) },
       uLength: { value: visual.beam.length },
     }),
-    [],
+    [post],
   );
 
   useFrame(() => {

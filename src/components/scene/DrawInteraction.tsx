@@ -54,8 +54,12 @@ export function DrawInteraction() {
       paint(h, h);
     };
     const onMove = (event: PointerEvent) => {
-      if (!active()) return;
+      if (!active()) {
+        stage.setCursorOnArm(false);
+        return;
+      }
       const h = hit(event);
+      stage.setCursorOnArm(Boolean(h));
       if (!h) return;
       target.current.copy(h.point);
       const { drawing, last } = stroke.current;

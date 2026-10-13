@@ -1,6 +1,7 @@
 "use client";
 
 import { site } from "@/config/site";
+import { enableSound } from "@/lib/sound";
 import { stage, useStage } from "@/lib/stage";
 import { Icon } from "./Icon";
 import styles from "./Header.module.css";
@@ -30,7 +31,10 @@ export function Header() {
           className={styles.sound}
           aria-pressed={sound}
           aria-label={sound ? site.sound.on : site.sound.off}
-          onClick={() => stage.setSound(!sound)}
+          onClick={() => {
+            if (!sound) enableSound();
+            stage.setSound(!sound);
+          }}
         >
           <Icon name={sound ? "volume" : "volumeOff"} size={14} />
           <span>{site.sound.label}</span>

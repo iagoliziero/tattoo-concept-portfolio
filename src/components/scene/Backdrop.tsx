@@ -5,11 +5,13 @@ import { useMemo } from "react";
 import { Vector2 } from "three";
 import { visual } from "@/config/visual";
 import { smoothstep } from "./canvas";
+import { toneMappingGlsl } from "./post/toneMapping";
 import { sceneState } from "./state";
 
 // Fundo em tela cheia: fumaça fbm com domain warping, brilho atrás da máquina,
-// raios de luz do canto superior e vinheta. Shader do protótipo, sem mudanças.
-// A saída não passa por tone mapping: as cores já estão no espaço da tela.
+// raios de luz do canto superior e vinheta. Shader do protótipo. As cores já
+// estão no espaço da tela: sem pós-processamento saem direto; com ele, saem
+// pelo tone mapping inverso, para o passe final devolver a mesma cor.
 
 const vertexShader = /* glsl */ `
 varying vec2 vUv;
@@ -24,7 +26,9 @@ uniform vec2 uR;
 uniform vec2 uO;
 uniform vec2 uL;
 uniform float uRed;
+uniform float uPost;
 varying vec2 vUv;
+${toneMappingGlsl}
 float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n(vec2 p) {
   vec2 i = floor(p), f = fract(p);
@@ -53,10 +57,11 @@ void main() {
   float ry = pow(max(0., n(vec2(an * 24., t * 6.)) - .45), 1.5) * 1.6;
   c += vec3(.15, .11, .08) * ry * smoothstep(1.5, .3, length(dv * asp)) * .55;
   c *= 1. - .6 * pow(length((vUv - .5) * vec2(1.15, 1.35)), 2.4);
+  if (uPost > .5) c = acesFilmicInverse(srgbToLinear(c));
   gl_FragColor = vec4(c, 1.);
 }`;
 
-export function Backdrop() {
+export function Backdrop({ post }: { post: boolean }) {
   const size = useThree((state) => state.size);
   const uniforms = useMemo(
     () => ({
@@ -65,8 +70,9 @@ export function Backdrop() {
       uO: { value: new Vector2() },
       uL: { value: new Vector2(...visual.backdrop.glow) },
       uRed: { value: visual.backdrop.redBase as number },
+      uPost: { value: post ? 1 : 0 },
     }),
-    [],
+    [post],
   );
 
   useFrame(() => {

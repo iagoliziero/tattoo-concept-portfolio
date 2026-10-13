@@ -323,8 +323,15 @@ export interface VisualConfig {
   inkCaps: readonly { position: readonly [number, number]; ink: Hex }[];
   bottles: readonly (readonly [number, number])[];
   post: {
+    /** Pós-processamento ligado (a fase 8 desliga no modo leve do celular). */
+    enabled: boolean;
     msaaSamples: number;
-    bloom: { strength: number; radius: number; threshold: number };
+    /** Bloom com desfoque em mipmaps, somado à cena antes do tone mapping. */
+    bloom: { intensity: number; radius: number; threshold: number; smoothing: number };
+    /**
+     * Grão, vinheta, aberração cromática nas bordas, toque quente e contraste,
+     * aplicados como no protótipo: depois do tone mapping, no espaço da tela.
+     */
     final: {
       chromaticAberration: number;
       warmTint: Vec3;
@@ -332,6 +339,12 @@ export interface VisualConfig {
       vignette: number;
       grain: number;
     };
+    /**
+     * O feixe e o neon iam direto para a tela no protótipo, sem tone mapping;
+     * aqui passam por ele, e estes fatores repõem o brilho original.
+     */
+    beamScale: number;
+    neonGlow: number;
   };
   materials: Record<MaterialName, MaterialParams>;
   machine: {
@@ -369,6 +382,52 @@ export interface VisualConfig {
   healing: readonly [HealingLayers, HealingLayers, HealingLayers, HealingLayers, HealingLayers];
   /** Linha do tempo que corre sozinha ao entrar na seção Cura (s). */
   healingAuto: { delay: number; duration: number };
+  /** Zumbido da máquina (Web Audio), tocado sempre que ela vibra. */
+  sound: {
+    volume: number;
+    saw: number;
+    square: { frequency: number; gain: number };
+    bandpass: { frequency: number; q: number };
+    noise: { highpass: number; gain: number };
+    /** Subida e descida do volume (s). */
+    attack: number;
+    release: number;
+  };
+  /** Cursor: anel com atraso e ponto vermelho (desligado no toque e com movimento reduzido). */
+  cursor: {
+    ring: number;
+    dot: number;
+    /** Rapidez do anel seguindo o ponteiro (1/s; protótipo ~ .2 por quadro). */
+    follow: number;
+    /** Escala do anel sobre itens clicáveis, sobre o braço no "tatue você" e pressionado. */
+    grow: number;
+    onArm: number;
+    pressed: number;
+  };
+  /** Respingos de tinta ao clicar em área vazia (canvas 2D por cima). */
+  splash: {
+    onClick: number;
+    onSubmit: number;
+    /** Velocidade (px por quadro a 60 fps), impulso para cima e raio (mín., máx.). */
+    speed: readonly [number, number];
+    lift: number;
+    radius: readonly [number, number];
+    gravity: number;
+    drag: number;
+    /** Duração (s). */
+    life: number;
+    /** Cores RGB e a chance de cada uma. */
+    colors: readonly { rgb: string; weight: number }[];
+  };
+  /** Portfólio: revelação das fotos e inclinação 3D dos cards. */
+  portfolio: {
+    revealDuration: number;
+    revealStagger: number;
+    tilt: readonly [number, number];
+    lift: number;
+  };
+  /** Contadores do Sobre. */
+  countUp: { duration: number };
 }
 
 export const visual = {
@@ -628,8 +687,10 @@ export const visual = {
     [-0.2, -3.05],
   ],
   post: {
+    enabled: true,
     msaaSamples: 4,
-    bloom: { strength: 0.5, radius: 0.5, threshold: 0.88 },
+    // Protótipo (UnrealBloom): força .5, raio .5, threshold .88. Ajustado na comparação lado a lado.
+    bloom: { intensity: 0.5, radius: 0.5, threshold: 0.88, smoothing: 0.03 },
     final: {
       chromaticAberration: 0.016,
       warmTint: [1.03, 0.99, 0.94],
@@ -637,6 +698,8 @@ export const visual = {
       vignette: 0.72,
       grain: 0.035,
     },
+    beamScale: 1,
+    neonGlow: 2.2,
   },
   materials: {
     chrome: { color: "#f4f2ec", metalness: 1, roughness: 0.07, clearcoat: 0.3 },
@@ -695,6 +758,37 @@ export const visual = {
   },
   // Protótipo: começa 0,6 s depois de entrar e avança 1,5 de 400 por quadro (~4,4 s a 60 fps).
   healingAuto: { delay: 0.6, duration: 4.4 },
+  // Grafo do protótipo; volume, subida e descida definidos aqui.
+  sound: {
+    volume: 0.12,
+    saw: 110,
+    square: { frequency: 55, gain: 0.35 },
+    bandpass: { frequency: 900, q: 0.9 },
+    noise: { highpass: 2500, gain: 0.25 },
+    attack: 0.03,
+    release: 0.06,
+  },
+  // Tamanhos do protótipo; escalas definidas aqui.
+  cursor: { ring: 34, dot: 5, follow: 13, grow: 1.6, onArm: 0.5, pressed: 0.85 },
+  // Quantidades, velocidades, raios e cores do protótipo; física definida aqui.
+  splash: {
+    onClick: 40,
+    onSubmit: 90,
+    speed: [1, 8],
+    lift: 2,
+    radius: [1, 5],
+    gravity: 0.25,
+    drag: 0.985,
+    life: 0.8,
+    colors: [
+      { rgb: "226,75,74", weight: 0.35 },
+      { rgb: "163,45,45", weight: 0.35 },
+      { rgb: "241,239,232", weight: 0.3 },
+    ],
+  },
+  // Revelação (.9 s) e inclinação (10°/12°, -3 px) do protótipo.
+  portfolio: { revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
+  countUp: { duration: 1.4 },
   healing: [
     { red: 0.9, blur: 0.7, gloss: 1, milk: 0, flakes: 0, ink: 1 },
     { red: 0.45, blur: 0.45, gloss: 0.35, milk: 0.06, flakes: 0.12, ink: 1 },

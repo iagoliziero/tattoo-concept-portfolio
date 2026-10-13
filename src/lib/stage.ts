@@ -11,6 +11,8 @@ export type DrawTool = "line" | "shade";
 export interface StageState {
   p: number;
   section: number;
+  /** A seção mais adiante já alcançada (revelações e contadores rodam uma vez). */
+  furthest: number;
   sound: boolean;
   /** Cicatrização mostrada na pele: 0 = Dia 0 ... 4 = Dia 30. */
   heal: number;
@@ -22,11 +24,14 @@ export interface StageState {
   /** Ferramenta do "tatue você mesmo" e se já há algo desenhado no braço. */
   drawTool: DrawTool;
   hasDrawing: boolean;
+  /** Ponteiro sobre a área livre do braço, no "tatue você mesmo" (cursor encolhe). */
+  cursorOnArm: boolean;
 }
 
 const initial: StageState = {
   p: 0,
   section: 0,
+  furthest: 0,
   sound: false,
   heal: 4,
   sessionStatus: "idle",
@@ -34,6 +39,7 @@ const initial: StageState = {
   sessionReplays: 0,
   drawTool: "line",
   hasDrawing: false,
+  cursorOnArm: false,
 };
 let state: StageState = initial;
 const listeners = new Set<() => void>();
@@ -63,6 +69,9 @@ export const stage = {
   get section() {
     return state.section;
   },
+  get furthest() {
+    return state.furthest;
+  },
   get sound() {
     return state.sound;
   },
@@ -81,8 +90,13 @@ export const stage = {
   get hasDrawing() {
     return state.hasDrawing;
   },
+  get cursorOnArm() {
+    return state.cursorOnArm;
+  },
   setP(p: number) {
-    if (p !== state.p) set({ p, section: Math.round(p) });
+    if (p === state.p) return;
+    const section = Math.round(p);
+    set({ p, section, furthest: Math.max(state.furthest, section) });
   },
   setSound(sound: boolean) {
     if (sound !== state.sound) set({ sound });
@@ -103,6 +117,9 @@ export const stage = {
   },
   setHasDrawing(hasDrawing: boolean) {
     if (hasDrawing !== state.hasDrawing) set({ hasDrawing });
+  },
+  setCursorOnArm(cursorOnArm: boolean) {
+    if (cursorOnArm !== state.cursorOnArm) set({ cursorOnArm });
   },
   subscribe(listener: () => void) {
     listeners.add(listener);

@@ -16,6 +16,7 @@ import { Dust } from "./Dust";
 import { Lights } from "./Lights";
 import { Machine } from "./Machine";
 import { Neon } from "./Neon";
+import { PostProcessing } from "./post/PostProcessing";
 import { SessionDirector } from "./SessionDirector";
 import { StudioEnvironment } from "./StudioEnvironment";
 import { Tattoo } from "./Tattoo";
@@ -38,6 +39,7 @@ function DevHandle() {
 
 export default function Scene() {
   const { fov, near, far } = visual.camera;
+  const post = visual.post.enabled;
   const { fog } = visual;
 
   return (
@@ -56,9 +58,9 @@ export default function Scene() {
       <SessionDirector />
       <CameraRig />
       <StudioEnvironment>
-        <Backdrop />
-        <Lights />
-        <Neon />
+        <Backdrop post={post} />
+        <Lights post={post} />
+        <Neon post={post} />
         <Workbench />
         <Arm />
         <Tattoo />
@@ -67,6 +69,7 @@ export default function Scene() {
         <InkMist />
         <Dust />
       </StudioEnvironment>
+      {post && <PostProcessing />}
       {process.env.NODE_ENV === "development" && <DevHandle />}
     </Canvas>
   );

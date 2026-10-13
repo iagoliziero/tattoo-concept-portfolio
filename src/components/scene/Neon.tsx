@@ -10,8 +10,9 @@ import { sceneState } from "./state";
 import { drawNeon } from "./textures";
 
 /** Letreiro "Lucas" atrás da máquina, sem tone mapping para o bloom pegar. */
-export function Neon() {
-  const { position, rotationY, size, glow, canvas: canvasSize } = visual.neon;
+export function Neon({ post }: { post: boolean }) {
+  const { position, rotationY, size, canvas: canvasSize } = visual.neon;
+  const glow = post ? visual.post.neonGlow : visual.neon.glow;
   const material = useRef<MeshBasicMaterial>(null);
   const { canvas, texture } = useMemo(() => {
     const canvas = makeCanvas(...canvasSize);

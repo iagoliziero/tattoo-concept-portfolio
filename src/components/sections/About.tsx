@@ -1,6 +1,7 @@
 import { site, type SectionId } from "@/config/site";
 import { getCareerYears } from "@/lib/server";
 import ui from "../ui.module.css";
+import { CountUp } from "./CountUp";
 import { Photo } from "./Photo";
 import styles from "./sections.module.css";
 
@@ -28,13 +29,14 @@ export async function About({ id }: { id: SectionId }) {
       <dl className={styles.counters}>
         <div className={styles.counter}>
           <dt className={styles.counterLabel}>{about.yearsLabel}</dt>
-          <dd className={`${ui.display} ${styles.counterValue}`}>{years}</dd>
+          <dd className={`${ui.display} ${styles.counterValue}`}>
+            <CountUp value={years} />
+          </dd>
         </div>
         <div className={styles.counter}>
           <dt className={styles.counterLabel}>{about.followersLabel}</dt>
           <dd className={`${ui.display} ${styles.counterValue}`}>
-            {value.toLocaleString("pt-BR")}
-            {suffix}
+            <CountUp value={value} suffix={suffix} />
           </dd>
         </div>
       </dl>
