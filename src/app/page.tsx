@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { Header } from "@/components/Header";
+import { MachineLabels } from "@/components/MachineLabels";
 import { ProgressLine } from "@/components/ProgressLine";
 import { SceneLoader } from "@/components/SceneLoader";
 import { ScrollController } from "@/components/ScrollController";
@@ -35,6 +36,7 @@ export default function Page() {
           return <Section key={id} id={id} />;
         })}
       </main>
+      <MachineLabels />
       <ScrollController />
     </>
   );

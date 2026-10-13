@@ -20,7 +20,10 @@ export type MaterialName =
   | "coil"
   | "capBlue"
   | "cord"
-  | "blackChrome";
+  | "blackChrome"
+  | "frame"
+  | "wireRed"
+  | "wireBlack";
 
 export interface MaterialParams {
   color: Hex;
@@ -41,9 +44,20 @@ export interface LightColor {
   space: "srgb" | "linear";
 }
 
+/**
+ * Rotação da máquina flutuando, como no st() do protótipo: ângulos base
+ * (radianos, ordem ZXY), giro contínuo em torno do eixo vertical (rad/s) e,
+ * opcionalmente, quanto o cursor inclina (eixo X) e gira (eixo Y) a máquina.
+ */
+export interface FloatingRotation {
+  tilt: Vec3;
+  spin: number;
+  follow?: readonly [number, number];
+}
+
 /** Câmera e máquina de uma seção. A sessão e o "tatue você" seguem a agulha. */
 export type Station =
-  | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3 }
+  | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3; rotation: FloatingRotation }
   | { kind: "session" }
   | { kind: "draw"; camera: Vec3; target: Vec3 };
 
@@ -88,6 +102,7 @@ export interface VisualConfig {
     cardBg: Rgba;
     slotBg: Rgba;
     fieldBg: Rgba;
+    labelBg: Rgba;
   };
   fonts: {
     /** Títulos. Carregada com next/font/google no layout. */
@@ -138,8 +153,11 @@ export interface VisualConfig {
     orbit: readonly [number, number];
     targetOffset: Vec3;
     lift: number;
+    /** Inclinação da máquina tatuando (radianos, ordem XYZ). */
+    tilt: Vec3;
   };
-  draw: { tip: Vec3; lift: number };
+  /** Igual à sessão, mais inclinada para não tampar a vista. */
+  draw: { tip: Vec3; lift: number; tilt: Vec3 };
   /** Balanço vertical da máquina flutuando: amplitude e velocidade. */
   bob: { amplitude: number; speed: number };
   fog: { color: Hex; near: number; far: number };
@@ -246,13 +264,35 @@ export interface VisualConfig {
   };
   materials: Record<MaterialName, MaterialParams>;
   machine: {
-    /** Deslocamento de cada peça na vista explodida (seção Sobre). */
+    /** Deslocamento de cada peça na vista explodida (eixos da máquina). */
     explode: Record<MachinePart, Vec3>;
-    /** Atraso de entrada de cada peça na montagem, em segundos. */
-    assemblyDelay: Record<MachinePart, number>;
-    assemblyDuration: number;
-    /** Ponto 3D de onde sai a etiqueta HTML de cada peça. */
+    /** Quanto a máquina está explodida em cada seção (0 a 1). */
+    explodeBySection: readonly [number, number, number, number, number, number];
+    /** Quanto a máquina inteira sobe quando explodida, para a biqueira não entrar no braço. */
+    explodeLift: Vec3;
+    /** Montagem na abertura da página. */
+    assembly: {
+      /** Espera antes da primeira peça (s). */
+      start: number;
+      /** Atraso de cada peça em relação à primeira (s). */
+      delay: Record<MachinePart, number>;
+      /** Duração da entrada de cada peça (s). */
+      duration: number;
+      /** De onde cada peça vem, em relação ao lugar dela (eixos da máquina). */
+      from: Record<MachinePart, Vec3>;
+      /** Giro em volta do eixo da máquina enquanto a peça entra (rad). */
+      spin: number;
+      /** Passada além do lugar antes de assentar (curva easeOutBack; 0 = sem). */
+      overshoot: number;
+    };
+    /** Fator do giro contínuo quando o sistema pede menos movimento. */
+    reducedSpin: number;
+    /** Ponto de onde sai a etiqueta HTML de cada peça (eixos da máquina). */
     labelAnchors: Record<LabeledPart, Vec3>;
+    /** A partir de quanto da vista explodida as etiquetas começam a aparecer. */
+    labelsFrom: number;
+    /** Fundo da gravação do quadro (o dourado vem de colors.gold). */
+    engravingBase: Hex;
   };
   /** Dia 0, 3, 7, 15 e 30, na mesma ordem dos textos em site.ts. */
   healing: readonly [HealingLayers, HealingLayers, HealingLayers, HealingLayers, HealingLayers];
@@ -283,6 +323,7 @@ export const visual = {
     cardBg: "rgba(14,13,12,.9)",
     slotBg: "rgba(20,19,18,.9)",
     fieldBg: "rgba(11,10,9,.75)",
+    labelBg: "rgba(11,10,9,.72)",
   },
   fonts: {
     display: "Pirata One",
@@ -313,11 +354,37 @@ export const visual = {
   },
   camera: { fov: 38, near: 0.03, far: 80, follow: 3.7 },
   stations: [
-    { kind: "fixed", camera: [0, 2.3, 7.4], target: [0.9, 2.1, 0], machine: [1.9, 0.5, 0.3] },
+    {
+      kind: "fixed",
+      camera: [0, 2.3, 7.4],
+      target: [0.9, 2.1, 0],
+      machine: [1.9, 0.5, 0.3],
+      rotation: { tilt: [0.1, 0.6, -0.2], spin: 0.35, follow: [-0.25, 0.8] },
+    },
     { kind: "session" },
-    { kind: "fixed", camera: [-0.75, 3.1, 1.7], target: [-0.75, -0.1, 0.15], machine: [1.7, 1.3, -1.6] },
-    { kind: "fixed", camera: [0.6, 4.4, 5.6], target: [0.7, 0.2, 0], machine: [3, 1.1, -1.4] },
-    { kind: "fixed", camera: [0, 2.5, 8.4], target: [1.3, 2.4, 0], machine: [2.3, 0.55, 0] },
+    {
+      kind: "fixed",
+      camera: [-0.75, 3.1, 1.7],
+      target: [-0.75, -0.1, 0.15],
+      machine: [1.7, 1.3, -1.6],
+      rotation: { tilt: [0.12, 0, 0.2], spin: 0.3 },
+    },
+    {
+      kind: "fixed",
+      camera: [0.6, 4.4, 5.6],
+      target: [0.7, 0.2, 0],
+      machine: [3, 1.1, -1.4],
+      rotation: { tilt: [0.15, 0, 0.2], spin: 0.3 },
+    },
+    {
+      // Sobre. No protótipo: câmera [0, 2.5, 8.4], alvo [1.3, 2.4, 0], que
+      // enquadram a máquina montada; recuados para caber a vista explodida.
+      kind: "fixed",
+      camera: [0, 2.9, 10.6],
+      target: [1.3, 3, 0],
+      machine: [2.3, 0.55, 0],
+      rotation: { tilt: [0.06, 0.8, -0.08], spin: 0.25 },
+    },
     { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1] },
   ],
   session: {
@@ -326,8 +393,9 @@ export const visual = {
     orbit: [1.25, 1.7],
     targetOffset: [0, 0.26, -0.1],
     lift: 0.16,
+    tilt: [-0.45, 2.05, 0],
   },
-  draw: { tip: [1.85, 0, 0.2], lift: 0.18 },
+  draw: { tip: [1.85, 0, 0.2], lift: 0.18, tilt: [-0.85, 2.05, 0] },
   bob: { amplitude: 0.06, speed: 1.1 },
   fog: { color: "#0c0a09", near: 12, far: 30 },
   environment: {
@@ -456,6 +524,10 @@ export const visual = {
     capBlue: { color: "#1d4f8f", metalness: 0.2, roughness: 0.3, clearcoat: 1 },
     cord: { color: "#8f1d1d", metalness: 0.1, roughness: 0.38, clearcoat: 0.6 },
     blackChrome: { color: "#1b1a19", metalness: 1, roughness: 0.22, clearcoat: 0.6 },
+    // Quadro em cromo negro com a gravação dourada (cor vem do canvas).
+    frame: { color: "#ffffff", metalness: 1, roughness: 0.26, clearcoat: 0.7, clearcoatRoughness: 0.12, bumpScale: -0.004 },
+    wireRed: { color: "#b0231c", metalness: 0, roughness: 0.4, clearcoat: 0.5 },
+    wireBlack: { color: "#1a1918", metalness: 0, roughness: 0.4, clearcoat: 0.5 },
   },
   machine: {
     explode: {
@@ -466,14 +538,35 @@ export const visual = {
       coil: [0.3, 0.9, 0],
       arm: [0.3, 1.5, 0],
     },
-    assemblyDelay: { tip: 0, grip: 0.12, tube: 0.24, frame: 0.36, coil: 0.5, arm: 0.64 },
-    assemblyDuration: 1.3,
+    explodeBySection: [0, 0, 0, 0, 1, 0],
+    explodeLift: [0, 0.4, 0],
+    // Atrasos e duração do protótipo. Origem, giro e passada definidos aqui:
+    // as peças de cima vêm do lado para onde se afastam na vista explodida;
+    // biqueira, grip e tubo vêm pela frente, para não atravessar braço e bancada.
+    assembly: {
+      start: 0.35,
+      delay: { tip: 0, grip: 0.12, tube: 0.24, frame: 0.36, coil: 0.5, arm: 0.64 },
+      duration: 1.3,
+      from: {
+        tip: [0, -0.5, 2.2],
+        grip: [0, -0.3, 1.6],
+        tube: [0, 0, 1.2],
+        frame: [0.9, 1, 0],
+        coil: [0.9, 2.7, 0],
+        arm: [0.9, 4.5, 0],
+      },
+      spin: 0.7,
+      overshoot: 0.9,
+    },
+    reducedSpin: 0.2,
     labelAnchors: {
       tip: [0, 0.22, 0.09],
       grip: [0, 0.9, 0.17],
       coil: [0.68, 2.76, 0.2],
       arm: [0.55, 3.15, 0.08],
     },
+    labelsFrom: 0.5,
+    engravingBase: "#131211",
   },
   healing: [
     { red: 0.9, blur: 0.7, gloss: 1, milk: 0, flakes: 0, ink: 1 },

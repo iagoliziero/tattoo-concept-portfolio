@@ -1,4 +1,4 @@
-import { CanvasTexture, Color, LinearSRGBColorSpace, RepeatWrapping, SRGBColorSpace } from "three";
+import { CanvasTexture, Color, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, SRGBColorSpace } from "three";
 import type { LightColor } from "@/config/visual";
 
 type Draw = (g: CanvasRenderingContext2D, w: number, h: number) => void;
@@ -11,13 +11,21 @@ export function makeCanvas(width: number, height: number, draw?: Draw) {
   return canvas;
 }
 
-/** Textura de canvas. `srgb` para cores; mapas de relevo ficam lineares. */
+/**
+ * Textura de canvas. `srgb` para cores; mapas de relevo ficam lineares.
+ * `sharp` desliga os mipmaps: listras finas (como o fio das bobinas) continuam
+ * visíveis de longe, ao custo de um leve serrilhado.
+ */
 export function canvasTexture(
   canvas: HTMLCanvasElement,
-  { srgb = false, repeat }: { srgb?: boolean; repeat?: readonly [number, number] } = {},
+  { srgb = false, repeat, sharp = false }: { srgb?: boolean; repeat?: readonly [number, number]; sharp?: boolean } = {},
 ) {
   const texture = new CanvasTexture(canvas);
   if (srgb) texture.colorSpace = SRGBColorSpace;
+  if (sharp) {
+    texture.generateMipmaps = false;
+    texture.minFilter = LinearFilter;
+  }
   if (repeat) {
     texture.wrapS = texture.wrapT = RepeatWrapping;
     texture.repeat.set(...repeat);

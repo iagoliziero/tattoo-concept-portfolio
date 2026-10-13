@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from "three";
+import { Quaternion, Vector2, Vector3 } from "three";
 import { visual } from "@/config/visual";
 
 // Estado da cena, atualizado a cada quadro pelo Director e pelo CameraRig e
@@ -13,8 +13,11 @@ export const sceneState = {
   pointer: new Vector2(),
   /** Para onde a câmera olha agora. */
   focus: new Vector3(),
-  /** Posição da máquina agora. */
+  /** Posição da máquina agora (ponta da agulha). */
   machine: new Vector3(),
+  machineQuat: new Quaternion(),
+  /** Quanto a máquina está explodida (0 a 1). */
+  explode: 0,
   /** Máquina projetada na tela, em [0, 1] a partir do canto inferior esquerdo. */
   machineScreen: new Vector2(...visual.backdrop.glow),
   /** Brilho do neon (1 = aceso), com as piscadas. */

@@ -1,0 +1,33 @@
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--c-text);
+  white-space: nowrap;
+  background: var(--c-label-bg);
+  border: 0.5px solid var(--c-border-soft);
+  border-radius: 999px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-red);
+}

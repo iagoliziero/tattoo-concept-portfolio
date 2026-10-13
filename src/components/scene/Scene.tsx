@@ -10,6 +10,7 @@ import { CameraRig } from "./CameraRig";
 import { Director } from "./Director";
 import { Dust } from "./Dust";
 import { Lights } from "./Lights";
+import { Machine } from "./Machine";
 import { Neon } from "./Neon";
 import { StudioEnvironment } from "./StudioEnvironment";
 import { sceneState } from "./state";
@@ -52,6 +53,7 @@ export default function Scene() {
         <Neon />
         <Workbench />
         <Arm />
+        <Machine />
         <Dust />
       </StudioEnvironment>
       {process.env.NODE_ENV === "development" && <DevHandle />}
