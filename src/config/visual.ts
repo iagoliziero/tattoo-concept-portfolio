@@ -44,6 +44,13 @@ export interface LightColor {
   space: "srgb" | "linear";
 }
 
+/** Imagem em /public, com o tamanho em pixels. */
+export interface PlaceholderImage {
+  src: string;
+  width: number;
+  height: number;
+}
+
 /**
  * Rotação da máquina flutuando, como no st() do protótipo: ângulos base
  * (radianos, ordem ZXY), giro contínuo em torno do eixo vertical (rad/s) e,
@@ -418,9 +425,22 @@ export interface VisualConfig {
   countUp: { duration: number };
   /**
    * Modo leve (celular e telas de toque): sem MSAA nem bloom, menos
-   * partículas, sombras e resolução menores.
+   * partículas, sombras e resolução menores. Liga quando `query` casa.
    */
-  lightMode: { maxPixelRatio: number; shadowMapSize: number; dust: number; droplets: number };
+  lightMode: { query: string; maxPixelRatio: number; shadowMapSize: number; dust: number; droplets: number };
+  /**
+   * Entrada da cena 3D. A página abre com uma imagem estática do estúdio e a
+   * cena só carrega na primeira interação (toque, rolagem, mouse, teclado) ou,
+   * sem interação, `autoStart` ms depois de a página carregar e ficar ociosa.
+   * Com o primeiro quadro pronto, a cena aparece sobre a imagem em `fade` s e
+   * a máquina se monta como antes.
+   */
+  sceneEntry: {
+    autoStart: number;
+    fade: number;
+    /** Imagens do estúdio sem a máquina, geradas por `npm run cena:captura` (ver README). */
+    placeholder: { mobile: PlaceholderImage; desktop: PlaceholderImage; quality: number };
+  };
   /** Em telas mais estreitas que a de referência, o campo de visão abre até este limite. */
   responsiveFov: { referenceAspect: number; max: number };
 }
@@ -770,7 +790,22 @@ export const visual = {
   // Revelação (.9 s) e inclinação (10°/12°, -3 px) do protótipo.
   portfolio: { columns: 4, revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
   countUp: { duration: 1.4 },
-  lightMode: { maxPixelRatio: 1.5, shadowMapSize: 1024, dust: 160, droplets: 35 },
+  lightMode: {
+    query: "(pointer: coarse), (max-width: 767.98px)",
+    maxPixelRatio: 1.5,
+    shadowMapSize: 1024,
+    dust: 160,
+    droplets: 35,
+  },
+  sceneEntry: {
+    autoStart: 4500,
+    fade: 0.8,
+    placeholder: {
+      mobile: { src: "/cena/inicio-mobile.webp", width: 618, height: 1373 },
+      desktop: { src: "/cena/inicio-desktop.webp", width: 1920, height: 1080 },
+      quality: 60,
+    },
+  },
   responsiveFov: { referenceAspect: 1.6, max: 62 },
   healing: [
     { red: 0.9, blur: 0.7, gloss: 1, milk: 0, flakes: 0, ink: 1 },

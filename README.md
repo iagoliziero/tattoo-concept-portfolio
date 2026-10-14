@@ -30,6 +30,7 @@ npm run lint
 | Foto do tatuador (retrato 4:5) | `public/tatuador.jpg` |
 | Envio do pedido de orçamento | `src/lib/quote.ts` |
 | Desenho da tatuagem da sessão | `src/components/scene/tattooArt.ts` |
+| Imagens do estúdio enquanto a cena 3D carrega | `public/cena/`, geradas por `npm run cena:captura` |
 
 Se alguma foto faltar, aparece um espaço reservado no lugar. Os caminhos
 podem ser trocados em `site.ts`.
@@ -53,6 +54,11 @@ Estúdio", "Sua Cidade", "@seuinstagram"). Em `src/config/site.ts`:
 Enquanto o link do Instagram (`artist.instagram.url`) e o WhatsApp
 (`artist.whatsapp`) estiverem vazios, os botões de contato continuam no lugar,
 mas não levam a lugar nenhum.
+
+Depois de mudar o neon, as cores ou qualquer coisa do fundo do início, gere de
+novo as imagens do estúdio que aparecem enquanto a cena 3D carrega
+(`public/cena/`): com `npm run dev` rodando, `npm run cena:captura`. O script
+usa o Chrome instalado (ou o caminho em `CHROME_PATH`).
 
 ## Antes de publicar
 

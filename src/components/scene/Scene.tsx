@@ -1,7 +1,7 @@
 "use client";
 
-import { Canvas, useThree } from "@react-three/fiber";
-import { useEffect, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
@@ -36,9 +36,19 @@ function PauseWhenHidden() {
 
 /** Celular e telas de toque: sem MSAA e bloom, menos partículas, sombras e resolução menores. */
 function detectLightMode() {
-  const light = matchMedia("(pointer: coarse)").matches || innerWidth < 768;
+  const light = matchMedia(visual.lightMode.query).matches;
   sceneState.light = light;
   return light;
+}
+
+/** Avisa quando os primeiros quadros já foram desenhados (shaders compilados, texturas enviadas). */
+function ReadySignal({ frames, onReady }: { frames: number; onReady: () => void }) {
+  const drawn = useRef(0);
+  useFrame(() => {
+    drawn.current += 1;
+    if (drawn.current === frames) onReady();
+  });
+  return null;
 }
 
 /** Só em desenvolvimento: expõe a cena para os scripts de comparação. */
@@ -55,7 +65,7 @@ function DevHandle() {
   return null;
 }
 
-export default function Scene() {
+export default function Scene({ onReady }: { onReady: () => void }) {
   const { fov, near, far } = visual.camera;
   const [light] = useState(detectLightMode);
   const post = visual.post.enabled && !light;
@@ -74,6 +84,7 @@ export default function Scene() {
     >
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
       <PauseWhenHidden />
+      <ReadySignal frames={2} onReady={onReady} />
       <Director />
       <SessionDirector />
       <CameraRig />

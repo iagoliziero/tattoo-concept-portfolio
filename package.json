@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cena:captura": "node scripts/captura-cena.mjs",
+    "cena:testar": "node scripts/testar-cena.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -27,6 +29,7 @@
     "@types/three": "~0.186.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "puppeteer-core": "25.14.0",
     "typescript": "^5"
   }
 }

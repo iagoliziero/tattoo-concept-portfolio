@@ -69,3 +69,26 @@ Só o relatório da mediana fica no repositório (`perf/<etapa>.json`).
    shader de tela cheia, sombras, materiais físicos, partículas). Pesa menos no
    TBT, mas pesa no celular de verdade. Menores: 191 KB de JS sem uso estimado,
    14 KB de polyfills, 110 ms de CSS bloqueante.
+
+## Etapa 1 · início sem a cena 3D na carga
+
+| Rodada | Nota | FCP | LCP | TBT | CLS | Speed Index | JS na carga |
+|---|---|---|---|---|---|---|---|
+| 1 | 81 | 1,49 s | 2,94 s | 471 ms | 0 | 4,03 s | 200 KB |
+| 2 | 86 | 1,40 s | 2,73 s | 329 ms | 0 | 4,12 s | 200 KB |
+| 3 (mediana) | **85** | 0,92 s | 2,72 s | 422 ms | 0 | 2,70 s | 200 KB |
+
+- A cena só carrega na primeira interação (toque, rolagem, mouse, teclado)
+  ou 4,5 s depois de a página carregar e ficar ociosa. Até lá, uma imagem do
+  estúdio sem a máquina (`public/cena/`, 6 KB em AVIF no celular) fica no
+  fundo; com o primeiro quadro pronto a cena aparece por cima em 0,8 s e a
+  máquina se monta como antes. Nada muda de posição: CLS 0.
+- O elemento de LCP continua sendo o parágrafo do hero (texto), não o canvas
+  nem a imagem.
+- Custo da cena quando ela entra (`npm run cena:testar`, celular emulado, CPU
+  4x): 8,4 s até o primeiro quadro, 7,9 s de bloqueio, maior tarefa 5,7 s.
+  O Lighthouse não vê esse custo; é o alvo das etapas 3 e 4.
+- O FCP observado nas rodadas do Lighthouse (1,2–2,6 s) é bem maior que fora
+  dele (0,17–0,33 s com o Chrome já aberto): parte do atraso é o Chrome frio
+  que o Lighthouse abre a cada rodada. Uma página HTML trivial pinta em 92 ms
+  no mesmo ambiente, então o resto vem do trabalho de JS antes da pintura.
