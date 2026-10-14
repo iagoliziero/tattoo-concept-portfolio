@@ -61,11 +61,10 @@ export interface FloatingRotation {
  */
 export type PortraitShift = readonly [number, number];
 
-/** Câmera e máquina de uma seção. A sessão e o "tatue você" seguem a agulha. */
+/** Câmera e máquina de uma seção. Na sessão, câmera e máquina seguem a agulha. */
 export type Station =
   | { kind: "fixed"; camera: Vec3; target: Vec3; machine: Vec3; rotation: FloatingRotation; portraitShift?: PortraitShift }
-  | { kind: "session" }
-  | { kind: "draw"; camera: Vec3; target: Vec3; portraitShift?: PortraitShift };
+  | { kind: "session" };
 
 /** Peso de cada camada da cicatrização num estágio (0 a 1). */
 export interface HealingLayers {
@@ -129,6 +128,11 @@ export interface VisualConfig {
     sections: number;
     /** Quanto da altura da tela cada seção fica fixa antes de seguir. */
     holdRatio: number;
+    /**
+     * Cura: a seção fica fixa por mais tempo e a rolagem dentro dela avança
+     * (ou volta) os dias da cicatrização. Em alturas de tela.
+     */
+    healingHold: number;
     /** Espera depois que a rolagem para, antes de encaixar na seção (s). */
     snapDelay: number;
     snapDuration: { min: number; max: number };
@@ -215,25 +219,6 @@ export interface VisualConfig {
     roughnessDry: number;
     roughnessWet: number;
   };
-  /** Igual à sessão, mais inclinada para não tampar a vista. */
-  draw: {
-    tip: Vec3;
-    lift: number;
-    tilt: Vec3;
-    /** Rapidez com que a agulha segue o cursor e desce na pele (1/s; protótipo: .3 e .25 por quadro). */
-    follow: number;
-    liftFollow: number;
-    /** O desenho só vale com p a esta distância da seção. */
-    activeWithin: number;
-    /** Margem das bordas da área livre: ao longo do braço (unidades) e em volta (rad). */
-    margin: { along: number; around: number };
-    line: { width: number; color: Rgba };
-    halo: { width: number; color: Rgba };
-    /** Sombra: pinceladas radiais muito transparentes a cada `spacing` pixels. */
-    shade: { radius: number; color: Rgba; spacing: number };
-    roughness: number;
-    envMapIntensity: number;
-  };
   /** Balanço vertical da máquina flutuando: amplitude e velocidade. */
   bob: { amplitude: number; speed: number };
   fog: { color: Hex; near: number; far: number };
@@ -315,7 +300,8 @@ export interface VisualConfig {
     envMapIntensity: number;
     textureWidth: number;
     tattoo: { span: number; length: number; textureWidth: number };
-    drawArea: { center: number; length: number; textureWidth: number };
+    /** Multiplica a cor da pele (1 = textura como está). */
+    brightness: number;
   };
   table: {
     y: number;
@@ -386,28 +372,14 @@ export interface VisualConfig {
   };
   /** Dia 0, 3, 7, 15 e 30, na mesma ordem dos textos em site.ts. */
   healing: readonly [HealingLayers, HealingLayers, HealingLayers, HealingLayers, HealingLayers];
-  /** Linha do tempo que corre sozinha ao entrar na seção Cura (s). */
-  healingAuto: { delay: number; duration: number };
-  /** Zumbido da máquina (Web Audio), tocado sempre que ela vibra. */
-  sound: {
-    volume: number;
-    saw: number;
-    square: { frequency: number; gain: number };
-    bandpass: { frequency: number; q: number };
-    noise: { highpass: number; gain: number };
-    /** Subida e descida do volume (s). */
-    attack: number;
-    release: number;
-  };
   /** Cursor: anel com atraso e ponto vermelho (desligado no toque e com movimento reduzido). */
   cursor: {
     ring: number;
     dot: number;
     /** Rapidez do anel seguindo o ponteiro (1/s; protótipo ~ .2 por quadro). */
     follow: number;
-    /** Escala do anel sobre itens clicáveis, sobre o braço no "tatue você" e pressionado. */
+    /** Escala do anel sobre itens clicáveis e pressionado. */
     grow: number;
-    onArm: number;
     pressed: number;
   };
   /** Respingos de tinta ao clicar em área vazia (canvas 2D por cima). */
@@ -425,8 +397,9 @@ export interface VisualConfig {
     /** Cores RGB e a chance de cada uma. */
     colors: readonly { rgb: string; weight: number }[];
   };
-  /** Portfólio: revelação das fotos e inclinação 3D dos cards. */
+  /** Portfólio: duas linhas de quatro, revelação das fotos e inclinação 3D dos cards. */
   portfolio: {
+    columns: number;
     revealDuration: number;
     revealStagger: number;
     tilt: readonly [number, number];
@@ -478,7 +451,7 @@ export const visual = {
     mono: "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace",
   },
   layout: {
-    headerHeight: 52,
+    headerHeight: 64,
     radius: 8,
     panelRadius: 10,
     minStageHeight: 560,
@@ -486,6 +459,7 @@ export const visual = {
   scroll: {
     sections: 6,
     holdRatio: 0.6,
+    healingHold: 3,
     snapDelay: 0.2,
     snapDuration: { min: 0.3, max: 0.8 },
   },
@@ -533,7 +507,14 @@ export const visual = {
       machine: [2.3, 0.55, 0],
       rotation: { tilt: [0.06, 0.8, -0.08], spin: 0.25 },
     },
-    { kind: "draw", camera: [1.3, 3.3, 1.25], target: [1.3, -0.1, 0.1], portraitShift: [0.3, 0.3] },
+    {
+      // Contato: máquina flutuando à direita do painel.
+      kind: "fixed",
+      camera: [0.4, 2.6, 7.6],
+      target: [1.2, 1.8, 0],
+      machine: [2.2, 0.55, 0.4],
+      rotation: { tilt: [0.08, 1.2, -0.15], spin: 0.3, follow: [-0.2, 0.6] },
+    },
   ],
   // Percurso, velocidade, alturas, zoom parado e inclinação: protótipo.
   // Push-in, balanço, rapidez do zoom e LED: definidos aqui.
@@ -579,21 +560,6 @@ export const visual = {
     envMapIntensity: 0.4,
     roughnessDry: 0.5,
     roughnessWet: 0.12,
-  },
-  // Tudo do protótipo.
-  draw: {
-    tip: [1.85, 0, 0.2],
-    lift: 0.18,
-    tilt: [-0.85, 2.05, 0],
-    follow: 21,
-    liftFollow: 17,
-    activeWithin: 0.35,
-    margin: { along: 0.04, around: 0.03 },
-    line: { width: 3.4, color: "rgba(22,17,15,.95)" },
-    halo: { width: 11, color: "rgba(190,70,55,.05)" },
-    shade: { radius: 18, color: "rgba(22,17,15,.06)", spacing: 3 },
-    roughness: 0.35,
-    envMapIntensity: 0.35,
   },
   bob: { amplitude: 0.06, speed: 1.1 },
   fog: { color: "#0c0a09", near: 12, far: 30 },
@@ -676,7 +642,8 @@ export const visual = {
     envMapIntensity: 0.25,
     textureWidth: 768,
     tattoo: { span: 1.44, length: 2, textureWidth: 880 },
-    drawArea: { center: 1.85, length: 1.4, textureWidth: 800 },
+    // Pedido do cliente: pele um pouco menos clara que no protótipo.
+    brightness: 0.8,
   },
   table: {
     y: -1,
@@ -772,20 +739,8 @@ export const visual = {
     labelsFrom: 0.5,
     engravingBase: "#131211",
   },
-  // Protótipo: começa 0,6 s depois de entrar e avança 1,5 de 400 por quadro (~4,4 s a 60 fps).
-  healingAuto: { delay: 0.6, duration: 4.4 },
-  // Grafo do protótipo; volume, subida e descida definidos aqui.
-  sound: {
-    volume: 0.12,
-    saw: 110,
-    square: { frequency: 55, gain: 0.35 },
-    bandpass: { frequency: 900, q: 0.9 },
-    noise: { highpass: 2500, gain: 0.25 },
-    attack: 0.03,
-    release: 0.06,
-  },
   // Tamanhos do protótipo; escalas definidas aqui.
-  cursor: { ring: 34, dot: 5, follow: 13, grow: 1.6, onArm: 0.5, pressed: 0.85 },
+  cursor: { ring: 34, dot: 5, follow: 13, grow: 1.6, pressed: 0.85 },
   // Quantidades, velocidades, raios e cores do protótipo; física definida aqui.
   splash: {
     onClick: 40,
@@ -803,7 +758,7 @@ export const visual = {
     ],
   },
   // Revelação (.9 s) e inclinação (10°/12°, -3 px) do protótipo.
-  portfolio: { revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
+  portfolio: { columns: 4, revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
   countUp: { duration: 1.4 },
   lightMode: { maxPixelRatio: 1.5, shadowMapSize: 1024, dust: 160, droplets: 35 },
   responsiveFov: { referenceAspect: 1.6, max: 62 },

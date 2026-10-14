@@ -6,7 +6,7 @@ import { stage } from "@/lib/stage";
 import styles from "./InkSplashes.module.css";
 
 // Respingos de tinta num canvas 2D por cima da página: ao clicar numa área
-// vazia (fora do "tatue você mesmo") e ao enviar o pedido de orçamento.
+// vazia e ao enviar o pedido de orçamento.
 
 interface Drop {
   x: number;
@@ -97,10 +97,10 @@ export function InkSplashes() {
       frame = requestAnimationFrame(tick);
     };
 
-    // Clique numa área vazia: o alvo é a cena 3D, fora da seção de desenho.
+    // Clique numa área vazia: o alvo é a cena 3D.
     const onClick = (event: MouseEvent) => {
       const onScene = (event.target as Element | null)?.closest?.("[data-scene]");
-      if (!onScene || stage.section === 5) return;
+      if (!onScene) return;
       splat(event.clientX, event.clientY, visual.splash.onClick);
     };
 

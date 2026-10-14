@@ -4,14 +4,11 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import * as THREE from "three";
 import { visual } from "@/config/visual";
-import { setBuzz } from "@/lib/sound";
 import { stage } from "@/lib/stage";
 import { Arm } from "./Arm";
 import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Director } from "./Director";
-import { DrawInteraction } from "./DrawInteraction";
-import { DrawSurface } from "./DrawSurface";
 import { InkMist } from "./InkMist";
 import { Dust } from "./Dust";
 import { Lights } from "./Lights";
@@ -24,13 +21,12 @@ import { Tattoo } from "./Tattoo";
 import { sceneState } from "./state";
 import { Workbench } from "./Workbench";
 
-/** Pausa a renderização (e o zumbido) com a aba oculta. */
+/** Pausa a renderização com a aba oculta. */
 function PauseWhenHidden() {
   const setFrameloop = useThree((state) => state.setFrameloop);
   useEffect(() => {
     const onChange = () => {
       setFrameloop(document.hidden ? "never" : "always");
-      if (document.hidden) setBuzz(false);
     };
     document.addEventListener("visibilitychange", onChange);
     return () => document.removeEventListener("visibilitychange", onChange);
@@ -79,7 +75,6 @@ export default function Scene() {
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
       <PauseWhenHidden />
       <Director />
-      <DrawInteraction />
       <SessionDirector />
       <CameraRig />
       <StudioEnvironment>
@@ -89,7 +84,6 @@ export default function Scene() {
         <Workbench />
         <Arm />
         <Tattoo />
-        <DrawSurface />
         <Machine />
         <InkMist />
         <Dust count={light ? lightMode.dust : visual.dust.count} />

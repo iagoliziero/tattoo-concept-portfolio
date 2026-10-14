@@ -9,11 +9,12 @@ import { ScrollController } from "@/components/ScrollController";
 import { SectionEffects } from "@/components/SectionEffects";
 import { StructuredData } from "@/components/StructuredData";
 import { About } from "@/components/sections/About";
+import { Contact } from "@/components/sections/Contact";
 import { Healing } from "@/components/sections/Healing";
 import { Hero } from "@/components/sections/Hero";
 import { Portfolio } from "@/components/sections/Portfolio";
 import { Session } from "@/components/sections/Session";
-import { TattooYourself } from "@/components/sections/TattooYourself";
+
 import { site, type SectionId } from "@/config/site";
 import styles from "./page.module.css";
 
@@ -25,7 +26,7 @@ const sections: Record<SectionId, ComponentType<{ id: SectionId }>> = {
   cura: Healing,
   trabalhos: Portfolio,
   sobre: About,
-  tatuar: TattooYourself,
+  contato: Contact,
 };
 
 export default function Page() {

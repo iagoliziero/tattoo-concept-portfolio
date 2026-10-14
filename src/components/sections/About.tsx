@@ -21,7 +21,7 @@ export async function About({ id }: { id: SectionId }) {
           image={artist.photo}
           placeholder="Foto do Lucas"
           icon="user"
-          sizes="112px"
+          sizes="180px"
           className={styles.portrait}
         />
         <p className={`${ui.text} ${ui.compact}`}>{about.story}</p>

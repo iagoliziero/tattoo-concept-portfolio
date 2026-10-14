@@ -9,8 +9,8 @@ const INTERACTIVE = 'a, button, input, select, textarea, label, [role="button"],
 
 /**
  * Cursor do protótipo: anel com atraso e ponto vermelho. Cresce sobre itens
- * clicáveis e encolhe sobre o braço no "tatue você mesmo". Só com mouse e sem
- * prefers-reduced-motion; no toque e com movimento reduzido fica o do sistema.
+ * clicáveis. Só com mouse e sem prefers-reduced-motion; no toque e com
+ * movimento reduzido fica o do sistema.
  */
 export function Cursor() {
   const ring = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ export function Cursor() {
     const fine = matchMedia("(pointer: fine)");
     if (!fine.matches || stage.reducedMotion) return;
     const root = document.documentElement;
-    const { follow, grow, onArm, pressed } = visual.cursor;
+    const { follow, grow, pressed } = visual.cursor;
     const target = { x: -100, y: -100 };
     const ringAt = { x: -100, y: -100 };
     let over = false;
@@ -56,7 +56,7 @@ export function Cursor() {
       const k = 1 - Math.exp(-dt * follow);
       ringAt.x += (target.x - ringAt.x) * k;
       ringAt.y += (target.y - ringAt.y) * k;
-      const scale = (over ? grow : stage.cursorOnArm ? onArm : 1) * (down ? pressed : 1);
+      const scale = (over ? grow : 1) * (down ? pressed : 1);
       if (ring.current) {
         ring.current.style.transform = `translate3d(${ringAt.x}px, ${ringAt.y}px, 0) translate(-50%, -50%) scale(${scale})`;
         ring.current.dataset.over = String(over);

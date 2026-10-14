@@ -6,14 +6,12 @@ import { useSyncExternalStore } from "react";
 // `stage.p` a cada quadro; componentes React usam `useStage`.
 
 export type SessionStatus = "idle" | "running" | "done";
-export type DrawTool = "line" | "shade";
 
 export interface StageState {
   p: number;
   section: number;
   /** A seção mais adiante já alcançada (revelações e contadores rodam uma vez). */
   furthest: number;
-  sound: boolean;
   /** Cicatrização mostrada na pele: 0 = Dia 0 ... 4 = Dia 30. */
   heal: number;
   sessionStatus: SessionStatus;
@@ -21,25 +19,16 @@ export interface StageState {
   sessionProgress: number;
   /** Conta os pedidos de "Ver de novo"; a cena recomeça quando muda. */
   sessionReplays: number;
-  /** Ferramenta do "tatue você mesmo" e se já há algo desenhado no braço. */
-  drawTool: DrawTool;
-  hasDrawing: boolean;
-  /** Ponteiro sobre a área livre do braço, no "tatue você mesmo" (cursor encolhe). */
-  cursorOnArm: boolean;
 }
 
 const initial: StageState = {
   p: 0,
   section: 0,
   furthest: 0,
-  sound: false,
   heal: 4,
   sessionStatus: "idle",
   sessionProgress: 0,
   sessionReplays: 0,
-  drawTool: "line",
-  hasDrawing: false,
-  cursorOnArm: false,
 };
 let state: StageState = initial;
 const listeners = new Set<() => void>();
@@ -58,6 +47,10 @@ function reducedMotionQuery() {
   return reducedMotion;
 }
 
+// Quem sabe converter um dia da cura em posição de rolagem (o ScrollController).
+type HealSeeker = (heal: number, smooth: boolean) => void;
+let healSeeker: HealSeeker | null = null;
+
 export const stage = {
   /** Sem vibração, tremores, piscadas e derivas. */
   get reducedMotion() {
@@ -72,9 +65,6 @@ export const stage = {
   get furthest() {
     return state.furthest;
   },
-  get sound() {
-    return state.sound;
-  },
   get heal() {
     return state.heal;
   },
@@ -84,22 +74,10 @@ export const stage = {
   get sessionProgress() {
     return state.sessionProgress;
   },
-  get drawTool() {
-    return state.drawTool;
-  },
-  get hasDrawing() {
-    return state.hasDrawing;
-  },
-  get cursorOnArm() {
-    return state.cursorOnArm;
-  },
   setP(p: number) {
     if (p === state.p) return;
     const section = Math.round(p);
     set({ p, section, furthest: Math.max(state.furthest, section) });
-  },
-  setSound(sound: boolean) {
-    if (sound !== state.sound) set({ sound });
   },
   setHeal(heal: number) {
     if (heal !== state.heal) set({ heal });
@@ -109,17 +87,15 @@ export const stage = {
       set({ sessionStatus, sessionProgress });
     }
   },
+  /** Rola a página até o dia da cura pedido (o ScrollController registra como). */
+  seekHeal(heal: number, smooth = true) {
+    healSeeker?.(heal, smooth);
+  },
+  setHealSeeker(seeker: HealSeeker | null) {
+    healSeeker = seeker;
+  },
   replaySession() {
     set({ sessionReplays: state.sessionReplays + 1 });
-  },
-  setDrawTool(drawTool: DrawTool) {
-    if (drawTool !== state.drawTool) set({ drawTool });
-  },
-  setHasDrawing(hasDrawing: boolean) {
-    if (hasDrawing !== state.hasDrawing) set({ hasDrawing });
-  },
-  setCursorOnArm(cursorOnArm: boolean) {
-    if (cursorOnArm !== state.cursorOnArm) set({ cursorOnArm });
   },
   subscribe(listener: () => void) {
     listeners.add(listener);

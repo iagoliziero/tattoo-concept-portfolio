@@ -9,7 +9,7 @@ import { skinBumpCanvas, skinCanvas } from "./textures";
 
 /** Braço: segmento de cilindro deitado com pele procedural e bordas que somem. */
 export function Arm() {
-  const { roughness, bumpScale, envMapIntensity } = visual.arm;
+  const { roughness, bumpScale, envMapIntensity, brightness } = visual.arm;
   const environment = useStudioEnvironment();
   const { map, bump } = useMemo(
     () => ({
@@ -31,6 +31,7 @@ export function Arm() {
       <cylinderGeometry args={[ARM_RADIUS, ARM_RADIUS, ARM_LENGTH, 128, 1, true, ARM_THETA_START, ARM_SPAN]} />
       <meshStandardMaterial
         map={map}
+        color={[brightness, brightness, brightness]}
         bumpMap={bump}
         bumpScale={bumpScale}
         roughness={roughness}

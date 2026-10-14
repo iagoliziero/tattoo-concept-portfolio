@@ -24,9 +24,7 @@ export const sceneState = {
   machineScreen: new Vector2(...visual.backdrop.glow),
   /** Brilho do neon (1 = aceso), com as piscadas. */
   neon: 1,
-  /** Visitante desenhando no braço (botão pressionado sobre a área livre). */
-  drawing: false,
-  /** Máquina ligada agora (sessão ou desenho), e o mesmo suavizado de 0 a 1 (fundo, som). */
+  /** Máquina ligada agora (sessão), e o mesmo suavizado de 0 a 1 (fundo mais vermelho). */
   machineOn: false,
   power: 0,
   /** Ponta da agulha na sessão: crua (move a máquina) e suavizada (a câmera segue). */
@@ -35,7 +33,4 @@ export const sceneState = {
   sessionLift: visual.session.lift as number,
   sessionZoom: visual.session.zoom as number,
   sessionAngle: 0,
-  /** Ponta da agulha no "tatue você mesmo" (a fase 6 faz ela seguir o mouse). */
-  drawTip: new Vector3(...visual.draw.tip),
-  drawLift: visual.draw.lift as number,
 };

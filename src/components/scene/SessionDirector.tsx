@@ -3,7 +3,6 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { visual } from "@/config/visual";
-import { setBuzz } from "@/lib/sound";
 import { stage } from "@/lib/stage";
 import { emitDroplet } from "./InkMist";
 import { createSession, makeNeedle } from "./session";
@@ -57,7 +56,7 @@ export function SessionDirector() {
     const sway = running ? config.sway.amplitude * Math.sin(clock.current * config.sway.speed) : 0;
     sceneState.sessionAngle += (sway - sceneState.sessionAngle) * ease;
 
-    sceneState.machineOn = running || sceneState.drawing;
+    sceneState.machineOn = running;
     sceneState.power += ((sceneState.machineOn ? 1 : 0) - sceneState.power) * (1 - Math.exp(-dt * 6));
 
     if (running && needle.down && !stage.reducedMotion) {
@@ -69,7 +68,6 @@ export function SessionDirector() {
     }
 
     stage.setSession(running ? "running" : session.done ? "done" : "idle", session.progress);
-    setBuzz(stage.sound && sceneState.machineOn);
   }, -1.5);
 
   return null;

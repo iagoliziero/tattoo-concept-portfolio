@@ -8,25 +8,31 @@ import { stage } from "@/lib/stage";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+const HEALING = 2;
+const LAST_DAY = visual.healing.length - 1;
+
 /**
  * Rolagem nativa: cada seção fica fixa por um trecho (holdRatio da altura da
  * tela) e depois dá lugar à próxima. Daqui sai `stage.p`, que a cena usa para
  * mover câmera e máquina. Ao parar no meio de uma passagem, a página encaixa
  * na seção mais próxima, como o protótipo fazia.
+ *
+ * A Cura fica fixa por mais tempo (healingHold): a rolagem dentro dela avança
+ * ou volta os dias da cicatrização, e só depois do último dia a página segue.
  */
 export function ScrollController() {
   useGSAP(() => {
     // No celular, a barra de endereço que some e aparece não recalcula as seções.
     ScrollTrigger.config({ ignoreMobileResize: true });
     const sections = gsap.utils.toArray<HTMLElement>("[data-section]");
-    const { holdRatio, snapDelay, snapDuration } = visual.scroll;
+    const { holdRatio, healingHold, snapDelay, snapDuration } = visual.scroll;
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const pins = sections.map((section) =>
+    const pins = sections.map((section, i) =>
       ScrollTrigger.create({
         trigger: section,
         start: "top top",
-        end: () => `+=${Math.round(window.innerHeight * holdRatio)}`,
+        end: () => `+=${Math.round(window.innerHeight * (i === HEALING ? healingHold : holdRatio))}`,
         pin: true,
         anticipatePin: 1,
       }),
@@ -44,7 +50,28 @@ export function ScrollController() {
       }
       return last;
     };
-    const update = () => stage.setP(progressAt(window.scrollY));
+
+    // Dia da cura a partir da rolagem: 0 ao chegar na Cura, o último ao sair.
+    // Antes disso (Início e Sessão), quem decide o dia é o SectionEffects.
+    const healing = pins[HEALING];
+    const healAt = (y: number) => {
+      const t = Math.min(1, Math.max(0, (y - healing.start) / (healing.end - healing.start)));
+      return t * LAST_DAY;
+    };
+    const update = () => {
+      const y = window.scrollY;
+      stage.setP(progressAt(y));
+      if (y >= pins[HEALING - 1].end) stage.setHeal(healAt(y));
+    };
+
+    // Controle da linha do tempo: rola até o dia pedido.
+    stage.setHealSeeker((heal, smooth) => {
+      const t = Math.min(1, Math.max(0, heal / LAST_DAY));
+      window.scrollTo({
+        top: healing.start + t * (healing.end - healing.start),
+        behavior: smooth && !reduceMotion ? "smooth" : "auto",
+      });
+    });
 
     ScrollTrigger.create({
       start: 0,
@@ -65,20 +92,21 @@ export function ScrollController() {
       },
     });
 
-    // Links para #secao levam ao meio do trecho fixo daquela seção.
+    // Links para #secao levam ao começo do trecho fixo daquela seção
+    // (na Cura, ao Dia 0).
     const onClick = (event: MouseEvent) => {
       const link = (event.target as Element | null)?.closest('a[href^="#"]');
       const href = link?.getAttribute("href");
       const i = sections.findIndex((section) => `#${section.id}` === href);
       if (i < 0) return;
       event.preventDefault();
-      window.scrollTo({
-        top: (pins[i].start + pins[i].end) / 2,
-        behavior: reduceMotion ? "auto" : "smooth",
-      });
+      window.scrollTo({ top: pins[i].start + 1, behavior: reduceMotion ? "auto" : "smooth" });
     };
     document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+      stage.setHealSeeker(null);
+    };
   });
 
   return null;

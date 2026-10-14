@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, 
 import { site, type PortfolioCategory, type PortfolioItem } from "@/config/site";
 import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
+import { Icon } from "../Icon";
 import ui from "../ui.module.css";
 import { PhotoFrame } from "./PhotoFrame";
 import styles from "./sections.module.css";
@@ -17,12 +18,12 @@ type Filter = PortfolioCategory | "all";
 const PORTFOLIO_SECTION = 3;
 
 /**
- * Filtros, cards com revelação animada na primeira chegada à seção,
- * inclinação 3D seguindo o ponteiro e lightbox para as fotos.
+ * Trabalhos em duas linhas de quatro, filtros, revelação animada na primeira chegada à seção, inclinação 3D
+ * seguindo o ponteiro e lightbox para as fotos.
  */
 export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; headingId: string }) {
   const { portfolio } = site;
-  const { revealDuration, revealStagger, tilt, lift } = visual.portfolio;
+  const { columns, revealDuration, revealStagger, tilt, lift } = visual.portfolio;
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<GalleryItem | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -33,17 +34,20 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
     () => true,
   );
 
+  const shown = items.filter((item) => filter === "all" || item.categories.includes(filter));
+
   const onTilt = (event: PointerEvent<HTMLElement>) => {
     if (stage.reducedMotion) return;
     const card = event.currentTarget;
     const r = card.getBoundingClientRect();
     const x = (event.clientX - r.left) / r.width - 0.5;
     const y = (event.clientY - r.top) / r.height - 0.5;
-    card.style.transform = `perspective(500px) rotateX(${(-y * tilt[0]).toFixed(1)}deg) rotateY(${(x * tilt[1]).toFixed(1)}deg) translateY(-${lift}px)`;
+    card.style.transform = `perspective(600px) rotateX(${(-y * tilt[0]).toFixed(1)}deg) rotateY(${(x * tilt[1]).toFixed(1)}deg) translateY(-${lift}px)`;
   };
   const resetTilt = (event: PointerEvent<HTMLElement>) => {
     event.currentTarget.style.transform = "";
   };
+
   // Abre depois que o conteúdo renderiza, para o foco ir ao botão Fechar.
   useEffect(() => {
     if (open && !dialog.current?.open) dialog.current?.showModal();
@@ -73,20 +77,21 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
         </div>
       </div>
 
-      <ul className={styles.grid} data-revealed={revealed}>
-        {items.map((item, i) => {
-          const dimmed = filter !== "all" && item.category !== filter;
+      <ul className={styles.grid} data-revealed={revealed} style={{ "--columns": columns } as CSSProperties}>
+        {shown.map((item, i) => {
           const content = (
             <>
               <PhotoFrame
                 image={item.image}
                 hasPhoto={item.hasPhoto}
                 placeholder={`Foto: ${item.title}`}
-                sizes="(max-width: 600px) 50vw, 240px"
+                sizes="(max-width: 640px) 25vw, 14vw"
                 className={styles.cardPhoto}
               />
-              <h3 className={styles.cardTitle}>{item.title}</h3>
-              <p className={styles.cardCaption}>{item.caption}</p>
+              <span className={styles.cardInfo}>
+                <span className={styles.cardTitle}>{item.title}</span>
+                <span className={styles.cardCaption}>{item.caption}</span>
+              </span>
             </>
           );
           const cardProps = {
@@ -99,7 +104,7 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
             } as CSSProperties,
           };
           return (
-            <li key={item.id} className={styles.cardItem} data-dimmed={dimmed} inert={dimmed}>
+            <li key={item.id}>
               {item.hasPhoto ? (
                 <button type="button" {...cardProps} aria-label={`${item.title}: ampliar foto`} onClick={() => setOpen(item)}>
                   {content}
@@ -111,6 +116,13 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
           );
         })}
       </ul>
+
+      <div className={styles.portfolioFoot} style={{ "--columns": columns } as CSSProperties}>
+        <a href={site.artist.instagram.url} target="_blank" rel="noopener" className={styles.instagram}>
+          <Icon name="instagram" size={18} />
+          {portfolio.instagramCta}
+        </a>
+      </div>
 
       <dialog
         ref={dialog}
@@ -130,7 +142,7 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
               <h3 id="lightbox-title" className={`${ui.display} ${styles.lightboxTitle}`}>
                 {open.title}
               </h3>
-              <p className={styles.cardCaption}>{open.caption}</p>
+              <p className={styles.lightboxCaption}>{open.caption}</p>
             </figcaption>
             <button
               type="button"

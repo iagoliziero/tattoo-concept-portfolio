@@ -3,8 +3,8 @@
 
 import type { LabeledPart } from "./visual";
 
-export type SectionId = "inicio" | "sessao" | "cura" | "trabalhos" | "sobre" | "tatuar";
-export type PortfolioCategory = "Religioso" | "Realismo" | "Black & gray";
+export type SectionId = "inicio" | "sessao" | "cura" | "trabalhos" | "sobre" | "contato";
+export type PortfolioCategory = "Religioso" | "Realismo" | "Black & gray" | "Colorido";
 
 export interface ImageRef {
   /** Caminho a partir de /public. */
@@ -15,7 +15,8 @@ export interface ImageRef {
 export interface PortfolioItem {
   id: string;
   title: string;
-  category: PortfolioCategory;
+  /** Filtros em que o trabalho aparece. */
+  categories: readonly PortfolioCategory[];
   caption: string;
   image: ImageRef;
 }
@@ -52,7 +53,6 @@ export interface SiteConfig {
   };
   meta: { title: string; description: string; imageAlt: string };
   nav: readonly { id: SectionId; label: string }[];
-  sound: { on: string; off: string; label: string };
   hero: {
     kicker: string;
     titleLines: readonly [string, string];
@@ -93,27 +93,38 @@ export interface SiteConfig {
     followersLabel: string;
     machineHint: string;
   };
-  tattoo: {
+  contact: {
     kicker: string;
     title: string;
     text: string;
-    /** Versão do texto para telas de toque. */
-    textTouch: string;
-    tools: { line: string; shade: string; clear: string };
+    instagramCta: string;
+    whatsappCta: string;
+    /** Mensagem que já abre escrita no WhatsApp. */
+    whatsappMessage: string;
     form: {
+      title: string;
       name: string;
       idea: string;
       ideaLabel: string;
       place: string;
       places: readonly string[];
+      image: {
+        label: string;
+        hint: string;
+        change: string;
+        remove: string;
+        /** Tamanho máximo, em MB. */
+        maxMb: number;
+        tooBig: string;
+        wrongType: string;
+      };
       submit: string;
       errors: { name: string; idea: string; place: string };
       sending: string;
       failed: string;
       sent: string;
-      sentWithDrawing: string;
+      sentWithImage: string;
       reply: string;
-      drawingAlt: string;
     };
   };
   machine: { labels: Record<LabeledPart, string> };
@@ -142,7 +153,7 @@ export const site = {
   artist,
   meta: {
     title: `${artist.name} · Tatuador de realismo e black & gray em ${artist.city}`,
-    description: `${artist.name}, tatuador especialista em realismo e black & gray em ${artist.city} desde ${artist.since}. Veja a cicatrização, o portfólio e desenhe sua ideia direto na pele.`,
+    description: `${artist.name}, tatuador especialista em realismo e black & gray em ${artist.city} desde ${artist.since}. Veja o portfólio, a cicatrização dia a dia e peça seu orçamento.`,
     imageAlt: `${artist.name}, tatuador de realismo e black & gray em ${artist.city}`,
   },
   nav: [
@@ -151,18 +162,13 @@ export const site = {
     { id: "cura", label: "Cura" },
     { id: "trabalhos", label: "Trabalhos" },
     { id: "sobre", label: "Sobre" },
-    { id: "tatuar", label: "Tatuar" },
+    { id: "contato", label: "Contato" },
   ],
-  sound: {
-    label: "Som",
-    on: "Desligar som da máquina",
-    off: "Ligar som da máquina",
-  },
   hero: {
     kicker: `Tatuador · ${artist.city} · desde ${artist.since}`,
     titleLines: ["Lucas", "Camargo"],
     text: "Realismo e black & gray de São Paulo. Do grafite à agulha, mais de duas décadas criando peças exclusivas para cada cliente.",
-    primaryCta: { label: "Tatue você mesmo", to: "tatuar" },
+    primaryCta: { label: "Pedir orçamento", to: "contato" },
     secondaryCta: { label: "Ver trabalhos", to: "trabalhos" },
     scrollHint: "Role para ver a máquina em ação",
   },
@@ -176,7 +182,7 @@ export const site = {
   healing: {
     kicker: "03 · Ciclo de vida",
     title: "Da agulha à pele curada",
-    text: "Arraste a linha do tempo e veja a tatuagem cicatrizar na pele, dia a dia.",
+    text: "Role a página e veja a tatuagem cicatrizar na pele, dia a dia.",
     sliderLabel: "Linha do tempo da cicatrização",
     dayMarks: ["Dia 0", "3", "7", "15", "30"],
     disclaimer: "Siga sempre as orientações do seu tatuador.",
@@ -211,49 +217,65 @@ export const site = {
       { value: "Religioso", label: "Religioso" },
       { value: "Realismo", label: "Realismo" },
       { value: "Black & gray", label: "Black & gray" },
+      { value: "Colorido", label: "Colorido" },
     ],
+    // Fotos em public/portfolio.
     items: [
       {
+        id: "polvo",
+        title: "Polvo e caveira",
+        categories: ["Realismo", "Black & gray"],
+        caption: "Black & gray · braço fechado",
+        image: { src: "/portfolio/tatto-ex1.jpg", alt: "Braço fechado em black and gray com caveira, polvo, bússola e tinteiro" },
+      },
+      {
+        id: "anjo-maria",
+        title: "Anjo e Maria",
+        categories: ["Religioso", "Realismo", "Black & gray"],
+        caption: "Black & gray · braço fechado",
+        image: { src: "/portfolio/tatto-ex2.jpg", alt: "Braço fechado com anjo em oração, terço, nuvens e Nossa Senhora" },
+      },
+      {
+        id: "crucificacao",
+        title: "Crucificação",
+        categories: ["Religioso", "Realismo", "Black & gray"],
+        caption: "Black & gray · costas",
+        image: { src: "/portfolio/tatto-ex3.jpg", alt: "Costas fechadas com Cristo crucificado, anjos, pomba e portões do céu" },
+      },
+      {
+        id: "anjo-guardiao",
+        title: "Anjo guardião",
+        categories: ["Religioso", "Realismo", "Black & gray"],
+        caption: "Black & gray · braço e mão",
+        image: { src: "/portfolio/tatto-ex4.jpg", alt: "Braço fechado com estátua de anjo no ombro e rosto de Cristo na mão" },
+      },
+      {
+        id: "aguias-caveiras",
+        title: "Águias e caveiras",
+        categories: ["Black & gray"],
+        caption: "Black & gray · costas",
+        image: { src: "/portfolio/tatto-ex5.jpg", alt: "Costas fechadas com duas águias, caveiras e ornamentos em black and gray" },
+      },
+      {
+        id: "rosas-olho",
+        title: "Rosas e olho",
+        categories: ["Black & gray"],
+        caption: "Black & gray · braço fechado",
+        image: { src: "/portfolio/tatto-ex6.jpg", alt: "Braço fechado com rosas, árvore, ornamentos e olho dentro de um triângulo" },
+      },
+      {
+        id: "sao-jorge",
+        title: "São Jorge",
+        categories: ["Religioso", "Colorido"],
+        caption: "Colorido · braço",
+        image: { src: "/portfolio/tatto-ex7.jpg", alt: "São Jorge colorido a cavalo enfrentando o dragão" },
+      },
+      {
         id: "jesus",
-        title: "Jesus",
-        category: "Religioso",
-        caption: "Black & gray · religioso",
-        image: { src: "/portfolio/jesus.jpg", alt: "Jesus em black and gray" },
-      },
-      {
-        id: "odin",
-        title: "Odin",
-        category: "Realismo",
-        caption: "Realismo · mitologia nórdica",
-        image: { src: "/portfolio/odin.jpg", alt: "Odin realista" },
-      },
-      {
-        id: "aguia",
-        title: "Águia",
-        category: "Black & gray",
-        caption: "Black & gray · fauna",
-        image: { src: "/portfolio/aguia.jpg", alt: "Águia em black and gray" },
-      },
-      {
-        id: "armadura",
-        title: "Armadura",
-        category: "Realismo",
+        title: "Jesus em oração",
+        categories: ["Religioso", "Realismo", "Black & gray"],
         caption: "Realismo · antebraço",
-        image: { src: "/portfolio/armadura.jpg", alt: "Armadura realista no antebraço" },
-      },
-      {
-        id: "catrina",
-        title: "Catrina",
-        category: "Black & gray",
-        caption: "Black & gray · chicano",
-        image: { src: "/portfolio/catrina.jpg", alt: "Catrina chicana" },
-      },
-      {
-        id: "navio",
-        title: "Navio",
-        category: "Black & gray",
-        caption: "Black & gray · marítimo",
-        image: { src: "/portfolio/navio.jpg", alt: "Navio em black and gray" },
+        image: { src: "/portfolio/tatto-ex8.jpg", alt: "Rosto de Jesus com coroa de espinhos e mãos em oração no antebraço" },
       },
     ],
     instagramCta: "Ver todos os trabalhos no Instagram",
@@ -267,30 +289,40 @@ export const site = {
     followersLabel: "seguidores no Instagram",
     machineHint: "A máquina, peça por peça →",
   },
-  tattoo: {
-    kicker: "06 · Tatue você mesmo",
-    title: "Desenhe direto na pele",
-    text: "Segure o clique sobre o braço: a máquina segue o mouse e tatua. Use Sombra para fazer graywash.",
-    textTouch: "Arraste o dedo sobre o braço: a máquina segue e tatua. Use Sombra para fazer graywash.",
-    tools: { line: "Traço", shade: "Sombra", clear: "Limpar" },
+  contact: {
+    kicker: "06 · Contato",
+    title: "Fale com o Lucas",
+    text: "Conte sua ideia e, se tiver, mande uma imagem de referência. O Lucas responde com o orçamento.",
+    instagramCta: "Chamar no Instagram",
+    whatsappCta: "Chamar no WhatsApp",
+    whatsappMessage: "Olá, Lucas! Vim pelo site e quero um orçamento.",
     form: {
+      title: "Ou peça pelo site",
       name: "Seu nome",
-      idea: "Conte a ideia: tema, referência",
+      idea: "Conte a ideia: tema, tamanho, referência",
       ideaLabel: "Sua ideia",
       place: "Local do corpo",
       places: ["Braço", "Antebraço", "Costas", "Perna", "Peito", "Outro"],
-      submit: "Pedir orçamento com desenho",
+      image: {
+        label: "Imagem de referência",
+        hint: "Opcional · JPG, PNG ou WEBP até 10 MB",
+        change: "Trocar imagem",
+        remove: "Remover",
+        maxMb: 10,
+        tooBig: "A imagem precisa ter até 10 MB.",
+        wrongType: "Envie uma imagem (JPG, PNG ou WEBP).",
+      },
+      submit: "Pedir orçamento",
       errors: {
         name: "Diga como podemos te chamar.",
-        idea: "Descreva a ideia ou desenhe no braço.",
+        idea: "Descreva a ideia ou envie uma imagem de referência.",
         place: "Escolha o local do corpo.",
       },
       sending: "Enviando…",
       failed: "Não foi possível enviar agora. Tente de novo em instantes.",
       sent: "Pedido enviado.",
-      sentWithDrawing: "Pedido enviado com seu desenho.",
+      sentWithImage: "Pedido enviado com sua referência.",
       reply: "O Lucas responde em breve.",
-      drawingAlt: "Seu desenho",
     },
   },
   machine: {

@@ -75,8 +75,8 @@ export function Machine() {
       const y = (-point.y * 0.5 + 0.5) * size.height;
       // Perto da borda direita, a etiqueta vira para o lado esquerdo do ponto.
       const width = (labelWidths.get(label) ?? labelWidths.set(label, label.offsetWidth).get(label))!;
-      const flip = x - 9 + width > size.width - 8;
-      label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(${flip ? "calc(9px - 100%)" : "-9px"}, -50%)`;
+      const flip = x - 11 + width > size.width - 8;
+      label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(${flip ? "calc(11px - 100%)" : "-11px"}, -50%)`;
       label.dataset.flip = String(flip);
       label.style.opacity = opacity.toFixed(3);
     }

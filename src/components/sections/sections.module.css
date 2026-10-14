@@ -1,4 +1,5 @@
-/* Layout das seções. Medidas do protótipo; cores vêm das variáveis da config.
+/* Layout das seções. Cores vêm das variáveis da config; tamanhos são fluidos
+   (clamp) para caber do celular ao monitor grande.
    Regra: estas classes só definem propriedades que as classes de ui.module.css
    do mesmo elemento não definem, para não depender da ordem dos arquivos. */
 
@@ -6,7 +7,7 @@
   position: relative;
   height: 100svh;
   min-height: var(--stage-min-h);
-  padding: 70px 2.5rem 34px;
+  padding: calc(var(--header-h) + 24px) clamp(16px, 4vw, 64px) 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -16,27 +17,36 @@
 
 .bottom {
   justify-content: flex-end;
-  padding-bottom: 30px;
 }
 
 .top {
   justify-content: flex-start;
-  padding-top: 64px;
 }
 
 .small {
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 0 0 14px;
+  font-size: clamp(16px, 0.5vw + 13px, 19px);
+  line-height: 1.55;
   color: var(--c-text-body);
+}
+
+/* Painéis: maiores, e com rolagem própria se a tela for baixa demais. */
+.sessionPanel,
+.healingPanel,
+.contactPanel {
+  width: 100%;
+  max-height: calc(100svh - var(--header-h) - 40px);
+  overflow-y: auto;
+  padding: clamp(18px, 2vw, 28px);
+  overscroll-behavior: contain;
 }
 
 /* Início */
 
 .heroTitle {
-  margin: 0 0 14px;
-  font-size: clamp(48px, 15vw, 76px);
-  line-height: 0.92;
+  margin: 0 0 18px;
+  font-size: clamp(56px, 9vw, 128px);
+  line-height: 0.9;
 }
 
 .heroTitle span {
@@ -46,16 +56,16 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 22px;
+  gap: 12px;
+  margin-top: 28px;
 }
 
 .hint {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 24px 0 0;
-  font-size: 12px;
+  gap: 8px;
+  margin: 28px 0 0;
+  font-size: 16px;
   color: var(--c-text-body);
 }
 
@@ -66,45 +76,35 @@
     0 0 14px rgba(9, 8, 7, 0.75);
 }
 
-/* Texto do "tatue você mesmo": mouse ou toque. */
-.touchText {
-  display: none;
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .pointerText {
-    display: none;
-  }
-
-  .touchText {
-    display: inline;
-  }
+/* Botões e cards têm fundo próprio: sem halo. */
+.overScene :is(a, button) {
+  text-shadow: none;
 }
 
 /* Sessão */
 
 .sessionPanel {
-  max-width: 290px;
-  padding: 14px 16px;
+  max-width: 440px;
 }
 
 .sessionTitle {
-  margin: 0 0 6px;
-  font-size: 32px;
+  margin: 0 0 8px;
+  font-size: clamp(34px, 3vw, 46px);
+  line-height: 1;
 }
 
 .status {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 15px;
   color: var(--c-text-secondary);
 }
 
 .led {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--c-border);
 }
@@ -132,8 +132,8 @@
 }
 
 .meter {
-  height: 2px;
-  margin-top: 8px;
+  height: 3px;
+  margin-top: 10px;
   background: var(--c-line);
 }
 
@@ -145,7 +145,7 @@
 }
 
 .replay {
-  margin-top: 10px;
+  margin-top: 14px;
   visibility: hidden;
 }
 
@@ -156,103 +156,101 @@
 /* Ciclo de vida */
 
 .healingPanel {
-  max-width: 300px;
-  padding: 16px 18px;
+  max-width: 480px;
 }
 
 .healingTitle {
-  margin: 0 0 6px;
-  font-size: 34px;
+  margin: 0 0 8px;
+  font-size: clamp(34px, 3.2vw, 48px);
   line-height: 1;
 }
 
 .stageTitle {
-  margin: 0 0 4px;
-  font-size: 22px;
+  margin: 0 0 6px;
+  font-size: clamp(24px, 2vw, 30px);
 }
 
 .stageTip {
-  min-height: 58px;
-  margin: 0 0 12px;
-  font-size: 13px;
+  min-height: 76px;
+  margin: 0 0 16px;
+  font-size: clamp(16px, 0.5vw + 13px, 19px);
   line-height: 1.5;
   color: var(--c-text-secondary);
 }
 
 .range {
   width: 100%;
+  height: 24px;
   accent-color: var(--c-red);
 }
 
 .marks {
   display: flex;
   justify-content: space-between;
-  margin-top: 2px;
+  margin-top: 4px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--c-text-muted);
 }
 
 .disclaimer {
-  margin: 10px 0 0;
-  font-size: 11px;
+  margin: 14px 0 0;
+  font-size: 13px;
   color: var(--c-text-muted);
 }
 
-/* Portfólio */
+/* Portfólio: duas linhas de --columns. A largura da grade sai da altura da
+   tela, para as duas linhas sempre caberem inteiras (cards em 4:5):
+   largura = colunas x 0,8 x (altura livre / 2) + espaços. */
 
 .portfolioHead {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 16px;
+  max-width: 980px;
+  margin-bottom: 18px;
 }
 
 .portfolioTitle {
   margin: 0;
-  font-size: 34px;
+  font-size: clamp(36px, 3.8vw, 56px);
+  line-height: 1;
 }
 
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: clamp(8px, 1.2vw, 16px);
+  width: min(100%, calc((100svh - 320px) * 0.4 * var(--columns) + 48px));
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.cardItem {
-  transition: opacity 0.3s;
-}
-
-.cardItem[data-dimmed="true"] {
-  opacity: 0.15;
-}
-
 .card {
   pointer-events: auto;
+  position: relative;
   display: block;
   width: 100%;
+  padding: 0;
+  overflow: hidden;
   font: inherit;
   color: inherit;
   text-align: left;
-  padding: 8px;
   background: var(--c-card-bg);
-  border: 0.5px solid var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
   border-radius: var(--radius-panel);
   transition:
     transform 0.2s,
-    border-color 0.2s,
-    opacity 0.3s;
+    border-color 0.2s;
 }
 
 .card:hover,
@@ -265,32 +263,65 @@ button.card {
 }
 
 .cardPhoto {
-  height: 96px;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+}
+
+/* Título e descrição sobre a foto, com degradê para ler sempre. */
+.cardInfo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: clamp(10px, 1.2vw, 16px);
+  background: linear-gradient(to top, rgba(9, 8, 7, 0.92), rgba(9, 8, 7, 0.55) 60%, transparent);
+  pointer-events: none;
 }
 
 .cardTitle {
-  margin: 6px 0 0;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: clamp(15px, 0.6vw + 12px, 21px);
+  font-weight: 700;
+  line-height: 1.2;
   color: var(--c-text);
 }
 
 .cardCaption {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--c-text-muted);
+  font-size: clamp(12px, 0.3vw + 11px, 15px);
+  color: var(--c-text-secondary);
+}
+
+.portfolioFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, calc((100svh - 320px) * 0.4 * var(--columns) + 48px));
+  margin-top: 16px;
 }
 
 .instagram {
   pointer-events: auto;
-  align-self: flex-start;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--c-text-secondary);
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--c-text);
   text-decoration: none;
+}
+
+
+/* No celular os cards ficam pequenos: só a foto (o título aparece ao ampliar). */
+@media (max-width: 640px) {
+  .cardInfo {
+    display: none;
+  }
 }
 
 /* Fotos (portfólio e retrato) */
@@ -346,9 +377,9 @@ button.card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 6px;
-  font-size: 11px;
+  gap: 6px;
+  padding: 8px;
+  font-size: 13px;
   line-height: 1.3;
   color: var(--c-text-muted);
   text-align: center;
@@ -361,28 +392,29 @@ button.card {
 /* Sobre */
 
 .aboutTitle {
-  margin: 0 0 14px;
-  font-size: 40px;
+  margin: 0 0 18px;
+  font-size: clamp(40px, 4.2vw, 60px);
+  line-height: 1;
 }
 
 .aboutRow {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  max-width: 380px;
+  gap: 20px;
+  max-width: 600px;
 }
 
 .portrait {
-  flex: 0 0 112px;
-  height: 140px;
+  flex: 0 0 clamp(120px, 12vw, 180px);
+  aspect-ratio: 4 / 5;
 }
 
 .counters {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  max-width: 300px;
-  margin: 18px 0 0;
+  gap: 16px;
+  max-width: 440px;
+  margin: 24px 0 0;
 }
 
 .counter {
@@ -392,62 +424,158 @@ button.card {
 
 .counterValue {
   margin: 0;
-  font-size: 36px;
-}
-
-.counterLabel {
-  font-size: 12px;
-  color: var(--c-text-muted);
-}
-
-.machineHint {
-  margin: 16px 0 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--c-text-body);
-}
-
-/* Tatue você mesmo */
-
-.tattooPanel {
-  max-width: 300px;
-  padding: 16px 18px;
-}
-
-.tattooTitle {
-  margin: 0 0 6px;
-  font-size: 32px;
+  font-size: clamp(44px, 4vw, 60px);
   line-height: 1;
 }
 
-.tools {
+.counterLabel {
+  margin-top: 4px;
+  font-size: 17px;
+  color: var(--c-text-body);
+}
+
+.machineHint {
+  margin: 20px 0 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--c-text-body);
+}
+
+/* Contato */
+
+.contactPanel {
+  max-width: 500px;
+}
+
+.contactTitle {
+  margin: 0 0 8px;
+  font-size: clamp(36px, 3.6vw, 52px);
+  line-height: 1;
+}
+
+.contactActions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contactButton {
+  flex: 1 1 200px;
+  min-height: 54px;
+  font-size: 17px;
+}
+
+.contactMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 16px 0 0;
+  font-size: 17px;
+  color: var(--c-text-secondary);
+}
+
+.contactMeta > span {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  margin-bottom: 12px;
+}
+
+.formTitle {
+  margin: 22px 0 10px;
+  padding-top: 18px;
+  border-top: 0.5px solid var(--c-border-soft);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-text-body);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.imageField {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px dashed var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-field-bg);
+  color: var(--c-text-body);
+  cursor: pointer;
+}
+
+.imageField:hover,
+.imageField:focus-within {
+  border-color: var(--c-red);
+}
+
+.imageField:focus-within {
+  outline: 2px solid var(--c-red);
+  outline-offset: 2px;
+}
+
+.imageField[data-filled="true"] {
+  border-style: solid;
+}
+
+.imageText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 16px;
+  color: var(--c-text);
+}
+
+.imageText > span:first-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.imageHint {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.imagePreview {
+  flex: none;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.imageRemove {
+  pointer-events: auto;
+  margin-top: 6px;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--c-text-body);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .submit {
-  align-self: flex-start;
+  align-self: stretch;
 }
 
 .sent {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 18px;
-  font-size: 12px;
+  gap: 10px;
+  min-height: 20px;
+  font-size: 15px;
   color: var(--c-success);
 }
 
 .thumbnail {
   flex: none;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 4px;
 }
 
@@ -460,28 +588,12 @@ button.card {
   cursor: progress;
 }
 
-.contact {
-  display: flex;
-  gap: 14px;
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--c-text-body);
-}
-
-.contact > * {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: inherit;
-  text-decoration: none;
-}
-
 /* Lightbox do portfólio */
 
 .lightbox {
-  width: min(92vw, 880px);
+  width: min(92vw, 960px);
   max-height: 92vh;
-  padding: 16px;
+  padding: 18px;
   color: var(--c-text);
   background: var(--c-panel-bg);
   border: 0.5px solid var(--c-border-soft);
@@ -495,13 +607,13 @@ button.card {
 .lightboxFigure {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin: 0;
 }
 
 .lightboxImage {
   position: relative;
-  height: min(70vh, 640px);
+  height: min(70vh, 700px);
 }
 
 .lightboxImage img {
@@ -510,7 +622,13 @@ button.card {
 
 .lightboxTitle {
   margin: 0;
-  font-size: 26px;
+  font-size: 30px;
+}
+
+.lightboxCaption {
+  margin: 4px 0 0;
+  font-size: 16px;
+  color: var(--c-text-secondary);
 }
 
 .lightboxClose {
@@ -521,36 +639,20 @@ button.card {
 
 @media (max-width: 640px) {
   .section {
-    padding: 64px 16px 24px;
+    padding: calc(var(--header-h) + 16px) 16px 20px;
   }
 
-  .bottom {
-    padding-bottom: 20px;
-  }
-
-  .top {
-    padding-top: 60px;
-  }
-
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .cardPhoto {
-    height: 84px;
-  }
-
-  .portfolioTitle {
-    font-size: 30px;
-  }
-
-  .aboutTitle {
-    font-size: 34px;
+  .aboutRow {
+    gap: 14px;
   }
 
   .counters {
-    margin-top: 14px;
+    margin-top: 16px;
+  }
+
+  .formTitle {
+    margin-top: 16px;
+    padding-top: 14px;
   }
 }
 
@@ -559,6 +661,5 @@ button.card {
 @media (max-width: 640px) and (orientation: portrait) {
   .panelDownOnPhone {
     justify-content: flex-end;
-    padding-bottom: 20px;
   }
 }

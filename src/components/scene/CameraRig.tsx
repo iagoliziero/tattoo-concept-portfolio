@@ -64,12 +64,6 @@ function poseAt(index: number, time: number, out: Pose) {
     out.machine.copy(sceneState.sessionTip);
     out.machine.y += sceneState.sessionLift;
     out.rotation.setFromEuler(euler.set(...visual.session.tilt, "XYZ"));
-  } else {
-    out.camera.fromArray(station.camera);
-    out.target.fromArray(station.target);
-    out.machine.copy(sceneState.drawTip);
-    out.machine.y += sceneState.drawLift;
-    out.rotation.setFromEuler(euler.set(...visual.draw.tilt, "XYZ"));
   }
 }
 

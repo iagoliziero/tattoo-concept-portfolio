@@ -1,12 +1,14 @@
 "use client";
 
 import { site } from "@/config/site";
-import { cancelAutoHeal } from "@/lib/healing";
 import { stage, useStage } from "@/lib/stage";
 import ui from "../ui.module.css";
 import styles from "./sections.module.css";
 
-/** Dia atual, dica de cuidado e a linha do tempo, que pode ser arrastada. */
+/**
+ * Dia atual, dica de cuidado e a linha do tempo. O dia segue a rolagem da
+ * página; arrastar o controle (ou usar as setas) rola até o dia escolhido.
+ */
 export function HealingTimeline() {
   const { healing } = site;
   const heal = useStage((s) => s.heal);
@@ -25,21 +27,16 @@ export function HealingTimeline() {
         max={last * 100}
         step={1}
         value={Math.round(heal * 100)}
-        onPointerDown={cancelAutoHeal}
         onKeyDown={(event) => {
           // Setas pulam de um dia para o outro (o passo fino fica para o arraste).
           const forward = event.key === "ArrowRight" || event.key === "ArrowUp";
           const back = event.key === "ArrowLeft" || event.key === "ArrowDown";
           if (!forward && !back) return;
           event.preventDefault();
-          cancelAutoHeal();
           const next = forward ? Math.floor(heal + 1e-6) + 1 : Math.ceil(heal - 1e-6) - 1;
-          stage.setHeal(Math.min(last, Math.max(0, next)));
+          stage.seekHeal(Math.min(last, Math.max(0, next)));
         }}
-        onChange={(event) => {
-          cancelAutoHeal();
-          stage.setHeal(Number(event.target.value) / 100);
-        }}
+        onChange={(event) => stage.seekHeal(Number(event.target.value) / 100, false)}
         aria-label={healing.sliderLabel}
         aria-valuetext={current.title}
         className={styles.range}

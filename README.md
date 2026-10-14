@@ -1,8 +1,9 @@
 # Tattoo Lucas
 
 Landing page e portfólio do tatuador Lucas Camargo (@tattoolucas): uma máquina
-de bobina em 3D que se monta sozinha, tatua o braço, mostra a cicatrização na
-pele e deixa o visitante desenhar.
+de bobina em 3D que se monta sozinha, tatua o braço e mostra a cicatrização na
+pele conforme a página rola. Termina no contato, com pedido de orçamento e
+imagem de referência.
 
 Next.js (App Router, TypeScript), React Three Fiber, drei,
 @react-three/postprocessing, three.js e GSAP ScrollTrigger. O protótipo
@@ -24,12 +25,12 @@ npm run lint
 |---|---|
 | Textos, dados do tatuador, portfólio, formulário, domínio | `src/config/site.ts` |
 | Cores, fontes, câmera, luzes, materiais, animações, efeitos | `src/config/visual.ts` |
-| Fotos do portfólio | `public/portfolio/` (`jesus.jpg`, `odin.jpg`, `aguia.jpg`, `armadura.jpg`, `catrina.jpg`, `navio.jpg`) |
+| Fotos do portfólio (8, em duas linhas de 4) | `public/portfolio/tatto-ex1.jpg` a `tatto-ex8.jpg`; títulos e filtros em `site.ts` |
 | Foto do Lucas (retrato 4:5) | `public/lucas.jpg` |
 | Envio do pedido de orçamento | `src/lib/quote.ts` |
 | Desenho da tatuagem da sessão | `src/components/scene/tattooArt.ts` |
 
-Sem as fotos, aparece um espaço reservado no lugar de cada uma. Os caminhos
+Se alguma foto faltar, aparece um espaço reservado no lugar. Os caminhos
 podem ser trocados em `site.ts`.
 
 ## Antes de publicar
@@ -42,7 +43,8 @@ podem ser trocados em `site.ts`.
 2. **Domínio**: preencher `url` em `src/config/site.ts`. Sem ele, a imagem de
    compartilhamento sai com endereço relativo e o sitemap fica vazio.
 3. **Endereço e WhatsApp**: `artist.address` e `artist.whatsapp` em
-   `site.ts` entram nos dados estruturados (schema.org TattooParlor).
+   `site.ts`. Com o WhatsApp preenchido, aparece o botão "Chamar no WhatsApp"
+   no contato; os dois entram nos dados estruturados (schema.org TattooParlor).
 
 ## Como está organizado
 
@@ -52,7 +54,7 @@ podem ser trocados em `site.ts`.
   servidor.
 - `src/components/scene/`: a cena 3D, carregada só no navegador. Cada
   arquivo cuida de uma parte: fundo, luzes, bancada, braço, tatuagem, máquina,
-  sessão, desenho do visitante, pós-processamento.
+  sessão, pós-processamento.
 - `src/lib/stage.ts`: estado compartilhado entre rolagem, interface e cena.
 - `assets/fonts/`: Pirata One em TTF para as imagens geradas (licença OFL em
   `assets/fonts/OFL.txt`).
@@ -65,5 +67,7 @@ podem ser trocados em `site.ts`.
 - Em celulares e telas de toque a cena entra em modo leve (sem MSAA e bloom,
   menos partículas). Com `prefers-reduced-motion`, não há vibração, tremores,
   cursor próprio nem respingos, e a máquina já aparece montada.
+- A seção Cura fica fixa por 3 alturas de tela: rolar avança ou volta os dias
+  (`visual.scroll.healingHold`).
 - O aviso "THREE.Clock deprecated" no console vem de dentro do
   `@react-three/fiber`, não do código do site.
