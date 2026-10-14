@@ -92,15 +92,18 @@ export function ScrollController() {
       },
     });
 
-    // Links para #secao levam ao começo do trecho fixo daquela seção
-    // (na Cura, ao Dia 0).
+    // Links para #secao pulam direto para o começo do trecho fixo daquela
+    // seção (na Cura, o Dia 0), sem rolar pelo caminho: a cena corta para lá
+    // e as seções do meio não animam. Daí em diante, a rolagem volta ao normal.
     const onClick = (event: MouseEvent) => {
       const link = (event.target as Element | null)?.closest('a[href^="#"]');
       const href = link?.getAttribute("href");
       const i = sections.findIndex((section) => `#${section.id}` === href);
       if (i < 0) return;
       event.preventDefault();
-      window.scrollTo({ top: pins[i].start + 1, behavior: reduceMotion ? "auto" : "smooth" });
+      window.scrollTo({ top: pins[i].start + 1, behavior: "instant" });
+      update();
+      stage.cut();
     };
     document.addEventListener("click", onClick);
     return () => {

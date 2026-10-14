@@ -19,6 +19,8 @@ export interface StageState {
   sessionProgress: number;
   /** Conta os pedidos de "Ver de novo"; a cena recomeça quando muda. */
   sessionReplays: number;
+  /** Conta os saltos dos links do menu; a cena corta direto para `p` quando muda. */
+  cuts: number;
 }
 
 const initial: StageState = {
@@ -29,6 +31,7 @@ const initial: StageState = {
   sessionStatus: "idle",
   sessionProgress: 0,
   sessionReplays: 0,
+  cuts: 0,
 };
 let state: StageState = initial;
 const listeners = new Set<() => void>();
@@ -74,6 +77,9 @@ export const stage = {
   get sessionProgress() {
     return state.sessionProgress;
   },
+  get cuts() {
+    return state.cuts;
+  },
   setP(p: number) {
     if (p === state.p) return;
     const section = Math.round(p);
@@ -93,6 +99,10 @@ export const stage = {
   },
   setHealSeeker(seeker: HealSeeker | null) {
     healSeeker = seeker;
+  },
+  /** Depois de um salto da rolagem: a cena vai direto para `p`, sem passar pelas seções do meio. */
+  cut() {
+    set({ cuts: state.cuts + 1 });
   },
   replaySession() {
     set({ sessionReplays: state.sessionReplays + 1 });

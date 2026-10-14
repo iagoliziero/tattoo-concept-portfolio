@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Vector2 } from "three";
 import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
@@ -25,6 +25,8 @@ function neonFlicker(t: number) {
 
 /** Primeiro a rodar em cada quadro: tempo, rolagem suavizada, cursor e neon. */
 export function Director() {
+  const cuts = useRef(stage.cuts);
+
   useEffect(() => {
     sceneState.p = stage.p;
     const [along, around] = visual.session.start;
@@ -54,6 +56,11 @@ export function Director() {
     const dt = Math.min(delta, 0.05);
     const follow = 1 - Math.exp(-dt * visual.camera.follow);
     sceneState.time += dt;
+    // Salto pelos links: corta direto, sem atravessar as seções do meio.
+    if (stage.cuts !== cuts.current) {
+      cuts.current = stage.cuts;
+      sceneState.p = stage.p;
+    }
     sceneState.p += (stage.p - sceneState.p) * follow;
     if (Math.abs(stage.p - sceneState.p) < 1e-4) sceneState.p = stage.p;
     sceneState.mouse.lerp(cursor, follow);
