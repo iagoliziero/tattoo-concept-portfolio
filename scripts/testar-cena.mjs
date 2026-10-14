@@ -12,7 +12,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import puppeteer from "puppeteer-core";
-import { chromePath, viewports } from "./chrome.mjs";
+import { chromePath, normalMotion, viewports } from "./chrome.mjs";
 
 const url = process.argv[2] ?? "http://localhost:3000";
 const costOnly = process.argv[3] === "--custo";
@@ -111,7 +111,7 @@ async function screens(browser, name, viewport) {
 }
 
 await mkdir(out, { recursive: true });
-const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
+const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: normalMotion });
 try {
   if (costOnly) {
     // Um Chrome novo (perfil temporário) por rodada: o cache de shaders começa
@@ -119,7 +119,7 @@ try {
     // rodada reaproveitaria os shaders já compilados.
     const runs = [];
     for (let i = 0; i < repeats; i++) {
-      const fresh = await puppeteer.launch({ executablePath: chromePath(), headless: true });
+      const fresh = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: normalMotion });
       const { entradaDaCena, erros } = await entryCost(fresh);
       await fresh.close();
       runs.push(entradaDaCena);

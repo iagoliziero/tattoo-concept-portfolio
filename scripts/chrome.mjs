@@ -18,6 +18,14 @@ export function chromePath() {
   return path;
 }
 
+/**
+ * O Chrome sem janela herda a preferência de animações do sistema: num
+ * Windows com "Mostrar animações" desligado, a página veria movimento
+ * reduzido. Os testes fixam o caso comum (sem preferência), como no
+ * PageSpeed Insights; o movimento reduzido é testado à parte.
+ */
+export const normalMotion = ["--force-prefers-no-reduced-motion"];
+
 /** Celular de referência do Lighthouse (Moto G Power) e uma tela grande comum. */
 export const viewports = {
   mobile: { width: 412, height: 823, deviceScaleFactor: 1.75, isMobile: true, hasTouch: true },

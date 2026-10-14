@@ -445,6 +445,11 @@ export interface VisualConfig {
   sceneEntry: {
     autoStart: number;
     fade: number;
+    /**
+     * Aparelhos que declaram menos memória que isto (GB, navigator.deviceMemory,
+     * só no Chrome) ficam com a imagem do estúdio, sem a cena 3D. 0 desliga.
+     */
+    minDeviceMemory: number;
     /** Imagens do estúdio sem a máquina, geradas por `npm run cena:captura` (ver README). */
     placeholder: { mobile: PlaceholderImage; desktop: PlaceholderImage; quality: number };
   };
@@ -804,6 +809,7 @@ export const visual = {
   sceneEntry: {
     autoStart: 4500,
     fade: 0.8,
+    minDeviceMemory: 1,
     placeholder: {
       mobile: { src: "/cena/inicio-mobile.webp", width: 618, height: 1373 },
       desktop: { src: "/cena/inicio-desktop.webp", width: 1920, height: 1080 },

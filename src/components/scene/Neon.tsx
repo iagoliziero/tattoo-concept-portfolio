@@ -1,6 +1,6 @@
 "use client";
 
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { AdditiveBlending, type MeshBasicMaterial } from "three";
 import { site } from "@/config/site";
@@ -14,6 +14,7 @@ export function Neon({ post }: { post: boolean }) {
   const { position, rotationY, size, canvas: canvasSize } = visual.neon;
   const glow = post ? visual.post.neonGlow : visual.neon.glow;
   const material = useRef<MeshBasicMaterial>(null);
+  const invalidate = useThree((state) => state.invalidate);
   const { canvas, texture } = useMemo(() => {
     const canvas = makeCanvas(...canvasSize);
     return { canvas, texture: canvasTexture(canvas, { srgb: true }) };
@@ -27,11 +28,13 @@ export function Neon({ post }: { post: boolean }) {
     const draw = () => {
       drawNeon(canvas, family, site.scene.neonTitle, site.scene.neonSubtitle);
       texture.needsUpdate = true;
+      // Com movimento reduzido a cena só desenha quando pedem.
+      invalidate();
     };
     draw();
     document.fonts.load(`150px ${family}`).then(draw, () => {});
     return () => texture.dispose();
-  }, [canvas, texture]);
+  }, [canvas, texture, invalidate]);
 
   useFrame(() => {
     material.current?.color.setScalar(glow * sceneState.neon);

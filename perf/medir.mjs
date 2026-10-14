@@ -1,5 +1,6 @@
 // Roda o Lighthouse mobile três vezes contra um build de produção rodando
 // (npm run build && npm start) e guarda só o relatório da mediana pela nota.
+// O Chrome sai sem preferência de movimento reduzido (ver scripts/chrome.mjs).
 // Uso: node perf/medir.mjs <etapa> [url] [categorias]
 
 import { execSync } from "node:child_process";
@@ -19,7 +20,7 @@ for (const path of images) await fetch(new URL(path, url), { headers: { accept: 
 const runs = [1, 2, 3].map((n) => {
   const file = `perf/${label}-${n}.json`;
   execSync(
-    `npx -y lighthouse@13.5.0 ${url} --only-categories=${categories} --output=json --output-path=${file} --chrome-flags="--headless=new" --quiet`,
+    `npx -y lighthouse@13.5.0 ${url} --only-categories=${categories} --output=json --output-path=${file} --chrome-flags="--headless=new --force-prefers-no-reduced-motion" --quiet`,
     { stdio: "inherit" },
   );
   const lhr = JSON.parse(readFileSync(file, "utf8"));

@@ -35,7 +35,8 @@ export function Director() {
     sceneState.sessionFocus.copy(sceneState.sessionTip);
 
     const onMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
+      // Com movimento reduzido, o cursor não mexe a máquina, a luz nem o fundo.
+      if (event.pointerType === "touch" || stage.reducedMotion) return;
       cursor.set(event.clientX / innerWidth - 0.5, event.clientY / innerHeight - 0.5);
       sceneState.pointer.set((event.clientX / innerWidth) * 2 - 1, -(event.clientY / innerHeight) * 2 + 1);
     };
@@ -55,7 +56,9 @@ export function Director() {
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
     const follow = 1 - Math.exp(-dt * visual.camera.follow);
-    sceneState.time += dt;
+    // Com movimento reduzido, o tempo do ambiente para: fumaça, feixe, poeira e
+    // máquina flutuando ficam parados (a sessão anda pelo próprio relógio).
+    if (!stage.reducedMotion) sceneState.time += dt;
     // Salto pelos links: corta direto, sem atravessar as seções do meio.
     if (stage.cuts !== cuts.current) {
       cuts.current = stage.cuts;

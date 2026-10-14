@@ -219,3 +219,35 @@ Custo da cena ao entrar (celular emulado, CPU 4x, Chrome frio, medianas de 3):
 - O maior trabalho de JS que sobra na carga é a criação dos 6 trechos fixos
   da rolagem (GSAP ScrollTrigger com `pin`): ~160 ms de CPU com layout
   forçado, dentro da hidratação. Ficou de fora (ver o relatório).
+
+## Etapa 6 · aparelhos limitados e movimento reduzido
+
+Lighthouse (agora com o Chrome sem preferência de movimento reduzido, ver
+abaixo): 75, 79, **78** (mediana), LCP 2,90 s, TBT 553 ms, CLS 0.
+
+`node scripts/testar-fallbacks.mjs` (celular emulado, cena já na tela, página parada):
+
+| | CPU da thread principal | Desenhos WebGL |
+|---|---|---|
+| Movimento normal | 285 ms/s | ~4 000 por segundo |
+| Movimento reduzido | 39,5 ms/s | 0 |
+
+- Movimento reduzido: a cena vira uma imagem parada. O tempo do ambiente
+  para (fumaça, feixe, poeira, máquina flutuando), o cursor não mexe nada e
+  a cena só desenha quando a pessoa rola, avança a cura ou a sessão anda,
+  até câmera e máquina assentarem. A sessão continua tatuando. Somado ao que
+  já existia (sem vibração, piscadas, cursor próprio e respingos; máquina já
+  montada), são 86% menos CPU com a página parada.
+- Sem WebGL2 (o three.js atual exige) a cena nem carrega; se o WebGL falhar
+  mesmo assim, um error boundary desliga só a cena. Testado com o Chrome
+  sem WebGL: imagem do estúdio no fundo, página inteira, nenhum erro sem
+  tratamento. Antes, uma falha dessas derrubava a página inteira.
+- Memória: aparelhos que declaram menos de 1 GB (`navigator.deviceMemory`,
+  só no Chrome) ficam com a imagem do estúdio. Bem conservador; ajustável em
+  `visual.sceneEntry.minDeviceMemory` (0 desliga).
+- Descoberta no caminho: o Chrome sem janela herda a preferência de
+  animações do sistema, e neste Windows ela está desligada. Todas as
+  medições das etapas 0 a 5 rodaram com movimento reduzido (igual para
+  todas, então as comparações entre elas valem). Daqui em diante os scripts
+  fixam "sem preferência" (`--force-prefers-no-reduced-motion`), como no
+  PageSpeed Insights.

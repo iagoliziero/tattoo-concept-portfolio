@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { getImageProps } from "next/image";
-import { useEffect, useState, type CSSProperties } from "react";
+import { Component, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { visual } from "@/config/visual";
 import styles from "./SceneLoader.module.css";
 
@@ -14,7 +14,7 @@ const WAKE_EVENTS = ["pointerdown", "pointermove", "touchstart", "wheel", "keydo
 
 // Estúdio em imagem enquanto a cena não chega: uma para o modo leve (celular),
 // que não tem pós-processamento, e outra para telas grandes.
-const { autoStart, fade, placeholder } = visual.sceneEntry;
+const { autoStart, fade, placeholder, minDeviceMemory } = visual.sceneEntry;
 // Uma <img> só (o <picture> escolhe o arquivo): carrega já, com prioridade alta.
 const common = {
   alt: "",
@@ -28,11 +28,21 @@ const {
 } = getImageProps({ ...common, ...placeholder.mobile });
 const { props: desktopImage } = getImageProps({ ...common, ...placeholder.desktop });
 
+/**
+ * Sem WebGL2 (o three.js atual exige) ou com memória muito baixa, a página
+ * fica com a imagem do estúdio: o conteúdo é todo HTML e não depende da cena.
+ */
+function canRunScene() {
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  if (memory !== undefined && memory < minDeviceMemory) return false;
+  return typeof WebGL2RenderingContext !== "undefined";
+}
+
 /** Na primeira interação ou, sem ela, depois que a página carregou e ficou ociosa. */
 function useWake() {
   const [awake, setAwake] = useState(false);
   useEffect(() => {
-    if (awake) return;
+    if (awake || !canRunScene()) return;
     const wake = () => setAwake(true);
     const options = { passive: true, capture: true } as const;
     for (const type of WAKE_EVENTS) window.addEventListener(type, wake, options);
@@ -54,6 +64,23 @@ function useWake() {
     };
   }, [awake]);
   return awake;
+}
+
+/** Se a cena falhar (contexto WebGL recusado, GPU bloqueada), só ela some: a imagem e a página ficam. */
+class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.warn("Cena 3D desligada; fica a imagem do estúdio.", error);
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
 /**
@@ -79,7 +106,9 @@ export function SceneLoader() {
       </picture>
       {awake && (
         <div className={styles.scene}>
-          <Scene onReady={() => setReady(true)} />
+          <SceneBoundary>
+            <Scene onReady={() => setReady(true)} />
+          </SceneBoundary>
         </div>
       )}
     </div>
