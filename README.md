@@ -18,6 +18,11 @@ npm run dev      # http://localhost:3000
 npm run build    # build de produção
 npm run start    # serve o build
 npm run lint
+
+# com o build de produção rodando:
+npm run cena:testar               # custo da cena ao entrar + foto de cada seção (perf/telas/)
+node scripts/testar-fallbacks.mjs # sem WebGL e movimento reduzido
+node perf/medir.mjs <nome>        # Lighthouse mobile 3x, guarda a mediana em perf/
 ```
 
 ## Onde mexer
@@ -93,9 +98,17 @@ usa o Chrome instalado (ou o caminho em `CHROME_PATH`).
 - As luzes foram recalibradas para a iluminação física do three.js atual,
   comparando com o protótipo (three r128) renderizado lado a lado. Os valores
   originais estão comentados em `visual.ts`.
-- Em celulares e telas de toque a cena entra em modo leve (sem MSAA e bloom,
-  menos partículas). Com `prefers-reduced-motion`, não há vibração, tremores,
-  cursor próprio nem respingos, e a máquina já aparece montada.
+- A cena 3D não entra na carga da página: começa na primeira interação (ou
+  4,5 s depois de a página ficar ociosa) por cima de uma imagem do estúdio,
+  com as texturas desenhadas num Web Worker e os shaders compilados sem
+  travar a página (`visual.sceneEntry`; detalhes em `perf/RELATORIO.md`).
+- Em celulares e telas de toque a cena entra em modo leve (sem
+  pós-processamento nem sombras dinâmicas, menos partículas). Com
+  `prefers-reduced-motion`, não há vibração, tremores, cursor próprio nem
+  respingos, a máquina já aparece montada e a cena fica parada: só desenha
+  quando a pessoa rola, avança a cura ou a sessão anda.
+- Sem WebGL2, ou com menos de 1 GB de memória declarada, fica a imagem do
+  estúdio no fundo; o conteúdo é todo HTML.
 - A Cura anda em etapas: cada gesto (roda, trackpad, swipe, setas) avança ou
   volta um dia; no Dia 30 o próximo gesto para baixo segue para os Trabalhos e,
   no Dia 0, um para cima volta à Sessão (`visual.scroll.healingStep`).

@@ -1,0 +1,117 @@
+
+0k2jfm1fq0nz-.js  231.8 KB comprimido (875.3 KB bruto)
+  grupos: async <- src/components/scene/Scene.tsx
+   177.0 KB  three
+    50.3 KB  @react-three/fiber
+     1.5 KB  scheduler
+     1.3 KB  its-fine
+     0.8 KB  use-sync-external-store
+     0.5 KB  suspend-react
+
+3u5hqigpkma_s.js  74.5 KB comprimido (224.2 KB bruto)
+  grupos: bootstrap <- next
+    74.5 KB  next
+
+03dbvig7x89gu.js  72.6 KB comprimido (176.3 KB bruto)
+  grupos: bootstrap <- next
+    72.6 KB  next
+
+2gnjyj7gtk7sk.js  67.2 KB comprimido (156.4 KB bruto)
+  grupos: render_dependent <- src/components/Cursor.tsx | render_dependent <- src/components/Header.tsx | render_dependent <- src/components/InkSplashes.tsx | render_dependent <- src/components/MachineLabels.tsx | render_dependent <- src/components/ProgressLine.tsx | render_dependent <- src/components/SceneLoader.tsx | render_dependent <- src/components/ScrollController.tsx | render_dependent <- src/components/SectionEffects.tsx | render_dependent <- src/components/sections/CountUp.tsx | render_dependent <- next | render_dependent <- src/components/sections/QuoteForm.tsx | render_dependent <- src/components/sections/HealingTimeline.tsx | render_dependent <- src/components/sections/PortfolioGallery.tsx | render_dependent <- src/components/sections/SessionStatus.tsx | render_dependent <- src/app/page.tsx
+    44.3 KB  gsap
+    10.8 KB  next
+     1.6 KB  src/components/sections/QuoteForm.tsx
+     1.6 KB  src/components/ScrollController.tsx
+     1.3 KB  src/components/sections/PortfolioGallery.tsx
+     1.0 KB  src/components/SceneLoader.tsx
+
+0cz1d0mv5g_q7.js  38.5 KB comprimido (110.0 KB bruto)
+  grupos: ?
+    38.5 KB  next
+
+2o0f2wspa1bnr.js  20.3 KB comprimido (74.8 KB bruto)
+  grupos: async <- src/components/scene/post/PostProcessing.tsx
+    12.4 KB  postprocessing
+     3.7 KB  n8ao
+     2.3 KB  @react-three/postprocessing
+     1.2 KB  maath
+     0.3 KB  src/components/scene/post/PostProcessing.tsx
+     0.3 KB  src/components/scene/post/FinishEffect.ts
+
+29r43565ovkef.js  18.9 KB comprimido (40.6 KB bruto)
+  grupos: async <- src/components/scene/Scene.tsx
+     4.3 KB  @react-three/fiber
+     1.6 KB  src/components/scene/machineModel.ts
+     1.4 KB  src/components/scene/Scene.tsx
+     1.1 KB  react-use-measure
+     1.1 KB  src/components/scene/CameraRig.tsx
+     0.9 KB  src/components/scene/Lights.tsx
+
+2_fu46mzabvi4.js  10.3 KB comprimido (23.2 KB bruto)
+  grupos: ?
+     3.0 KB  src/config/visual.ts
+     2.3 KB  src/config/site.ts
+     1.3 KB  src/components/scene/tattooSurface.ts
+     1.1 KB  src/components/scene/textures.ts
+     1.0 KB  src/components/scene/machineTextures.ts
+     0.8 KB  src/components/scene/tattooArt.ts
+
+0n8m-qztlwln2.js  9.0 KB comprimido (21.1 KB bruto)
+  grupos: bootstrap <- next
+     8.6 KB  next
+     0.4 KB  @swc/helpers
+
+09dhg7pxggajs.js  6.5 KB comprimido (13.7 KB bruto)
+  grupos: render_dependent <- next | render_dependent <- src/app/icon--metadata.js
+     6.5 KB  next
+
+27d2_fah14zia.js  6.0 KB comprimido (13.8 KB bruto)
+  grupos: render_dependent <- src/components/Cursor.tsx | render_dependent <- src/components/Header.tsx | render_dependent <- src/components/InkSplashes.tsx | render_dependent <- src/components/MachineLabels.tsx | render_dependent <- src/components/ProgressLine.tsx | render_dependent <- src/components/SceneLoader.tsx | render_dependent <- src/components/ScrollController.tsx | render_dependent <- src/components/SectionEffects.tsx | render_dependent <- src/components/sections/CountUp.tsx | render_dependent <- next | render_dependent <- src/components/sections/QuoteForm.tsx | render_dependent <- src/components/sections/HealingTimeline.tsx | render_dependent <- src/components/sections/PortfolioGallery.tsx | render_dependent <- src/components/sections/SessionStatus.tsx | render_dependent <- src/app/page.tsx
+     3.0 KB  src/config/visual.ts
+     2.3 KB  src/config/site.ts
+     0.6 KB  src/lib/stage.ts
+     0.1 KB  src/components/scene/labels.ts
+
+turbopack-18hpueb50ebbw.js  5.0 KB comprimido (11.0 KB bruto)
+  grupos: bootstrap <- next
+     2.1 KB  [turbopack]/shared/runtime/runtime-utils.ts
+     1.1 KB  [turbopack]/browser/runtime/dom/runtime-backend-dom.ts
+     1.0 KB  [turbopack]/browser/runtime/base/runtime-base.ts
+     0.6 KB  [turbopack]/shared/runtime/async-module.ts
+     0.3 KB  [turbopack]/browser/runtime/base/build-base.ts
+
+1ckai8i45nwgw.js  4.8 KB comprimido (10.7 KB bruto)
+  grupos: async <- src/components/scene/Scene.tsx
+     1.3 KB  src/components/scene/tattooSurface.ts
+     1.1 KB  src/components/scene/textures.ts
+     1.0 KB  src/components/scene/machineTextures.ts
+     0.8 KB  src/components/scene/tattooArt.ts
+     0.3 KB  src/components/scene/armGeometry.ts
+     0.2 KB  src/components/scene/draw.ts
+
+turbopack-worker-3u9zil6-2a08n.js  0.6 KB comprimido (0.9 KB bruto)
+  grupos: ?
+     0.6 KB  [client-fs]/_next/static/chunks/turbopack-worker-3u9zil6-2a08n.js
+
+turbopack-2mvkdw8q_j0lg.js  0.2 KB comprimido (0.2 KB bruto)
+  grupos: ?
+     0.2 KB  [client-fs]/_next/static/chunks/turbopack-2mvkdw8q_j0lg.js
+
+Total JS de cliente da rota /: 566.1 KB comprimido
+
+Maiores pacotes (comprimido):
+   211.5 KB  next
+   177.1 KB  three
+    54.6 KB  @react-three/fiber
+    44.3 KB  gsap
+    12.4 KB  postprocessing
+     6.0 KB  src/config/visual.ts
+     4.6 KB  src/config/site.ts
+     3.7 KB  n8ao
+     2.6 KB  src/components/scene/tattooSurface.ts
+     2.3 KB  @react-three/postprocessing
+     2.2 KB  src/components/scene/textures.ts
+     2.1 KB  [turbopack]/shared/runtime/runtime-utils.ts
+     1.9 KB  src/components/scene/machineTextures.ts
+     1.6 KB  src/components/scene/machineModel.ts
+     1.6 KB  src/components/sections/QuoteForm.tsx
