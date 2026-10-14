@@ -12,7 +12,7 @@ interface Pose {
   target: Vector3;
   machine: Vector3;
   rotation: Quaternion;
-  /** Deslocamento do assunto em retrato (painel embaixo): esquerda e cima, em frações da tela. */
+  /** Deslocamento do assunto em retrato (painel embaixo): esquerda (fração da distância) e cima (fração da altura). */
   portraitShift: Vector2;
 }
 
@@ -106,8 +106,9 @@ export function CameraRig() {
     // assunto vai para a esquerda e para cima na tela, longe do painel.
     shift.lerpVectors(from.portraitShift, to.portraitShift, f);
     if (aspect < 1 && (shift.x !== 0 || shift.y !== 0)) {
-      const height = 2 * camera.position.distanceTo(sceneState.focus) * Math.tan((camera.fov * Math.PI) / 360);
-      screenRight.set(1, 0, 0).applyQuaternion(camera.quaternion).multiplyScalar(shift.x * height * aspect);
+      const distance = camera.position.distanceTo(sceneState.focus);
+      const height = 2 * distance * Math.tan((camera.fov * Math.PI) / 360);
+      screenRight.set(1, 0, 0).applyQuaternion(camera.quaternion).multiplyScalar(shift.x * distance);
       screenUp.set(0, 1, 0).applyQuaternion(camera.quaternion).multiplyScalar(-shift.y * height);
       camera.position.add(screenRight).add(screenUp);
       sceneState.focus.add(screenRight).add(screenUp);

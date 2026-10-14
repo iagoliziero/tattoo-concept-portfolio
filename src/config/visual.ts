@@ -56,8 +56,10 @@ export interface FloatingRotation {
 }
 
 /**
- * Em retrato estreito (painel embaixo), quanto o assunto se desloca na tela:
- * [para a esquerda, em fração da largura; para cima, em fração da altura].
+ * Em retrato (painel embaixo), quanto o assunto se desloca:
+ * [para a esquerda, em fração da distância câmera–alvo (vale igual em qualquer
+ * largura de tela, então centraliza do celular ao tablet); para cima, em
+ * fração da altura da tela (o espaço que o painel ocupa embaixo)].
  */
 export type PortraitShift = readonly [number, number];
 
@@ -489,7 +491,7 @@ export const visual = {
       machine: [1.7, 1.3, -1.6],
       rotation: { tilt: [0.12, 0, 0.2], spin: 0.3 },
       // Em retrato o painel desce: a tatuagem vai para o centro e sobe.
-      portraitShift: [0.34, 0.22],
+      portraitShift: [0.21, 0.22],
     },
     {
       kind: "fixed",
