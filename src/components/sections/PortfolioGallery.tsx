@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type PointerEvent } from "react";
 import { site, type PortfolioCategory, type PortfolioItem } from "@/config/site";
 import { visual } from "@/config/visual";
+import { externalLink } from "@/lib/links";
 import { stage } from "@/lib/stage";
 import { Icon } from "../Icon";
 import ui from "../ui.module.css";
@@ -118,7 +119,7 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
       </ul>
 
       <div className={styles.portfolioFoot} style={{ "--columns": columns } as CSSProperties}>
-        <a href={site.artist.instagram.url} target="_blank" rel="noopener" className={styles.instagram}>
+        <a {...externalLink(site.artist.instagram.url)} className={styles.instagram}>
           <Icon name="instagram" size={18} />
           {portfolio.instagramCta}
         </a>
