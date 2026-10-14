@@ -35,7 +35,7 @@ export function shareImage(size: { width: number; height: number }) {
           {artist.name}
         </div>
         <div style={{ display: "flex", fontSize: 34, color: colors.textSecondary, marginTop: 28 }}>
-          Realismo e black & gray · {artist.instagram.handle}
+          Portfólio e orçamento · {artist.instagram.handle}
         </div>
       </div>
     ),
@@ -43,6 +43,7 @@ export function shareImage(size: { width: number; height: number }) {
   );
 }
 
+/** Ícone com a inicial do nome do tatuador. */
 export function iconImage(size: { width: number; height: number }) {
   return new ImageResponse(
     (
@@ -61,7 +62,7 @@ export function iconImage(size: { width: number; height: number }) {
           borderRadius: size.width > 64 ? 0 : size.width * 0.2,
         }}
       >
-        L
+        {site.artist.name.charAt(0)}
       </div>
     ),
     { ...size, fonts },

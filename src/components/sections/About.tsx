@@ -19,7 +19,7 @@ export async function About({ id }: { id: SectionId }) {
       <div className={styles.aboutRow}>
         <Photo
           image={artist.photo}
-          placeholder="Foto do Lucas"
+          placeholder="Foto do tatuador"
           icon="user"
           sizes="180px"
           className={styles.portrait}

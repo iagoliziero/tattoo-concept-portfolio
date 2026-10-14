@@ -2,10 +2,14 @@ import { site } from "@/config/site";
 
 /** Dados estruturados de estúdio de tatuagem (schema.org TattooParlor). */
 export function StructuredData() {
-  const { artist, meta } = site;
+  const { artist, meta, portfolio } = site;
   const url: string | null = site.url;
   const address: string | null = artist.address;
   const whatsapp: string | null = artist.whatsapp;
+  const instagram: string | null = artist.instagram.url;
+  const sameAs = instagram ? { sameAs: [instagram] } : {};
+  // Os estilos são os filtros do portfólio.
+  const styles = portfolio.filters.flatMap((filter) => (filter.value === "all" ? [] : [filter.label]));
   const data = {
     "@context": "https://schema.org",
     "@type": "TattooParlor",
@@ -20,13 +24,13 @@ export function StructuredData() {
       addressRegion: artist.state,
       addressCountry: "BR",
     },
-    sameAs: [artist.instagram.url],
+    ...sameAs,
     employee: {
       "@type": "Person",
       name: artist.name,
       jobTitle: "Tatuador",
-      knowsAbout: ["Realismo", "Black & gray"],
-      sameAs: [artist.instagram.url],
+      knowsAbout: styles,
+      ...sameAs,
     },
   };
   return (

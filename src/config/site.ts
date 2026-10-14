@@ -1,5 +1,7 @@
 // Textos, dados e imagens do site, tipados.
 // Para trocar uma foto, coloque o arquivo no caminho indicado dentro de /public.
+// Os dados do tatuador (nome, marca, cidade, contatos, história, portfólio) são
+// de exemplo: troque pelos do cliente. A lista do que preencher está no README.
 
 import type { LabeledPart } from "./visual";
 
@@ -28,7 +30,7 @@ export interface HealingStage {
 
 export interface SiteConfig {
   /**
-   * Endereço do site publicado, como "https://tattoolucas.com.br". Usado na
+   * Endereço do site publicado, como "https://seuestudio.com.br". Usado na
    * imagem de compartilhamento, no sitemap e nos dados estruturados. A preencher.
    */
   url: string | null;
@@ -41,12 +43,16 @@ export interface SiteConfig {
     since: number;
     instagram: {
       handle: string;
-      url: string;
+      /** A preencher. Sem ele, os botões do Instagram ficam no lugar, mas sem link. */
+      url: string | null;
       followers: { value: number; suffix: string };
     };
     /** A preencher. */
     address: string | null;
-    /** A preencher, só números com DDI e DDD (ex.: 5511999999999). */
+    /**
+     * A preencher, só números com DDI e DDD (ex.: 5511999999999). Sem ele, o
+     * botão do WhatsApp fica no lugar, mas sem link.
+     */
     whatsapp: string | null;
     /** Retrato 4:5. */
     photo: ImageRef;
@@ -133,28 +139,28 @@ export interface SiteConfig {
 }
 
 const artist = {
-  name: "Lucas Camargo",
-  brand: "Tattoo Lucas",
-  city: "São Paulo",
-  state: "SP",
-  since: 2004,
+  name: "Nome Sobrenome",
+  brand: "Seu Estúdio",
+  city: "Sua Cidade",
+  state: "UF",
+  since: 2015,
   instagram: {
-    handle: "@tattoolucas",
-    url: "https://www.instagram.com/tattoolucas/",
-    followers: { value: 130, suffix: " mil+" },
+    handle: "@seuinstagram",
+    url: null,
+    followers: { value: 10, suffix: " mil+" },
   },
   address: null,
   whatsapp: null,
-  photo: { src: "/lucas.jpg", alt: "Foto de Lucas Camargo" },
+  photo: { src: "/tatuador.jpg", alt: "Foto do tatuador" },
 } as const satisfies SiteConfig["artist"];
 
 export const site = {
   url: null,
   artist,
   meta: {
-    title: `${artist.name} · Tatuador de realismo e black & gray em ${artist.city}`,
-    description: `${artist.name}, tatuador especialista em realismo e black & gray em ${artist.city} desde ${artist.since}. Veja o portfólio, a cicatrização dia a dia e peça seu orçamento.`,
-    imageAlt: `${artist.name}, tatuador de realismo e black & gray em ${artist.city}`,
+    title: `${artist.name} · Tatuador em ${artist.city}`,
+    description: `${artist.name}, tatuador em ${artist.city} desde ${artist.since}. Veja o portfólio, a cicatrização dia a dia e peça seu orçamento.`,
+    imageAlt: `${artist.name}, tatuador em ${artist.city}`,
   },
   nav: [
     { id: "inicio", label: "Início" },
@@ -166,8 +172,8 @@ export const site = {
   ],
   hero: {
     kicker: `Tatuador · ${artist.city} · desde ${artist.since}`,
-    titleLines: ["Lucas", "Camargo"],
-    text: "Realismo e black & gray de São Paulo. Do grafite à agulha, mais de duas décadas criando peças exclusivas para cada cliente.",
+    titleLines: ["Nome", "Sobrenome"],
+    text: `Tatuagens exclusivas em ${artist.city}, do primeiro esboço à pele cicatrizada. Cada peça nasce da sua ideia e é desenhada só para você.`,
     primaryCta: { label: "Pedir orçamento", to: "contato" },
     secondaryCta: { label: "Ver trabalhos", to: "trabalhos" },
     scrollHint: "Role para ver a máquina em ação",
@@ -211,7 +217,7 @@ export const site = {
   },
   portfolio: {
     kicker: "04 · Portfólio",
-    title: "Trabalhos do Lucas",
+    title: "Trabalhos recentes",
     filters: [
       { value: "all", label: "Todos" },
       { value: "Religioso", label: "Religioso" },
@@ -219,83 +225,83 @@ export const site = {
       { value: "Black & gray", label: "Black & gray" },
       { value: "Colorido", label: "Colorido" },
     ],
-    // Fotos em public/portfolio.
+    // Fotos em public/portfolio. Títulos, legendas e filtros são de exemplo;
+    // no alt, descreva o que aparece na foto.
     items: [
       {
-        id: "polvo",
-        title: "Polvo e caveira",
+        id: "trabalho-1",
+        title: "Trabalho 01",
         categories: ["Realismo", "Black & gray"],
         caption: "Black & gray · braço fechado",
-        image: { src: "/portfolio/tatto-ex1.jpg", alt: "Braço fechado em black and gray com caveira, polvo, bússola e tinteiro" },
+        image: { src: "/portfolio/tatto-ex1.jpg", alt: "Trabalho 01 do portfólio" },
       },
       {
-        id: "anjo-maria",
-        title: "Anjo e Maria",
+        id: "trabalho-2",
+        title: "Trabalho 02",
         categories: ["Religioso", "Realismo", "Black & gray"],
         caption: "Black & gray · braço fechado",
-        image: { src: "/portfolio/tatto-ex2.jpg", alt: "Braço fechado com anjo em oração, terço, nuvens e Nossa Senhora" },
+        image: { src: "/portfolio/tatto-ex2.jpg", alt: "Trabalho 02 do portfólio" },
       },
       {
-        id: "crucificacao",
-        title: "Crucificação",
+        id: "trabalho-3",
+        title: "Trabalho 03",
         categories: ["Religioso", "Realismo", "Black & gray"],
         caption: "Black & gray · costas",
-        image: { src: "/portfolio/tatto-ex3.jpg", alt: "Costas fechadas com Cristo crucificado, anjos, pomba e portões do céu" },
+        image: { src: "/portfolio/tatto-ex3.jpg", alt: "Trabalho 03 do portfólio" },
       },
       {
-        id: "anjo-guardiao",
-        title: "Anjo guardião",
+        id: "trabalho-4",
+        title: "Trabalho 04",
         categories: ["Religioso", "Realismo", "Black & gray"],
         caption: "Black & gray · braço e mão",
-        image: { src: "/portfolio/tatto-ex4.jpg", alt: "Braço fechado com estátua de anjo no ombro e rosto de Cristo na mão" },
+        image: { src: "/portfolio/tatto-ex4.jpg", alt: "Trabalho 04 do portfólio" },
       },
       {
-        id: "aguias-caveiras",
-        title: "Águias e caveiras",
+        id: "trabalho-5",
+        title: "Trabalho 05",
         categories: ["Black & gray"],
         caption: "Black & gray · costas",
-        image: { src: "/portfolio/tatto-ex5.jpg", alt: "Costas fechadas com duas águias, caveiras e ornamentos em black and gray" },
+        image: { src: "/portfolio/tatto-ex5.jpg", alt: "Trabalho 05 do portfólio" },
       },
       {
-        id: "rosas-olho",
-        title: "Rosas e olho",
+        id: "trabalho-6",
+        title: "Trabalho 06",
         categories: ["Black & gray"],
         caption: "Black & gray · braço fechado",
-        image: { src: "/portfolio/tatto-ex6.jpg", alt: "Braço fechado com rosas, árvore, ornamentos e olho dentro de um triângulo" },
+        image: { src: "/portfolio/tatto-ex6.jpg", alt: "Trabalho 06 do portfólio" },
       },
       {
-        id: "sao-jorge",
-        title: "São Jorge",
+        id: "trabalho-7",
+        title: "Trabalho 07",
         categories: ["Religioso", "Colorido"],
         caption: "Colorido · braço",
-        image: { src: "/portfolio/tatto-ex7.jpg", alt: "São Jorge colorido a cavalo enfrentando o dragão" },
+        image: { src: "/portfolio/tatto-ex7.jpg", alt: "Trabalho 07 do portfólio" },
       },
       {
-        id: "jesus",
-        title: "Jesus em oração",
+        id: "trabalho-8",
+        title: "Trabalho 08",
         categories: ["Religioso", "Realismo", "Black & gray"],
         caption: "Realismo · antebraço",
-        image: { src: "/portfolio/tatto-ex8.jpg", alt: "Rosto de Jesus com coroa de espinhos e mãos em oração no antebraço" },
+        image: { src: "/portfolio/tatto-ex8.jpg", alt: "Trabalho 08 do portfólio" },
       },
     ],
     instagramCta: "Ver todos os trabalhos no Instagram",
   },
   about: {
     kicker: "05 · Sobre",
-    title: "Do grafite à agulha",
-    story:
-      "Lucas começou a tatuar em 2004, depois de anos no grafite, que até hoje guia sua composição. Hoje se dedica quase só ao preto e cinza, com peças exclusivas para cada cliente.",
+    title: "Por trás da máquina",
+    story: `Começou a tatuar em ${artist.since} e, desde então, transforma ideias em peças únicas. Cada projeto começa numa conversa e ganha um desenho feito do zero.`,
     yearsLabel: "anos de carreira",
     followersLabel: "seguidores no Instagram",
     machineHint: "A máquina, peça por peça →",
   },
   contact: {
     kicker: "06 · Contato",
-    title: "Fale com o Lucas",
-    text: "Conte sua ideia e, se tiver, mande uma imagem de referência. O Lucas responde com o orçamento.",
+    title: "Marque sua sessão",
+    text: "Conte sua ideia e, se tiver, mande uma imagem de referência. A resposta vem com o orçamento.",
     instagramCta: "Chamar no Instagram",
     whatsappCta: "Chamar no WhatsApp",
-    whatsappMessage: "Olá, Lucas! Vim pelo site e quero um orçamento.",
+    whatsappMessage: "Olá! Vim pelo site e quero um orçamento.",
     form: {
       title: "Ou peça pelo site",
       name: "Seu nome",
@@ -322,7 +328,7 @@ export const site = {
       failed: "Não foi possível enviar agora. Tente de novo em instantes.",
       sent: "Pedido enviado.",
       sentWithImage: "Pedido enviado com sua referência.",
-      reply: "O Lucas responde em breve.",
+      reply: "Você recebe a resposta em breve.",
     },
   },
   machine: {
@@ -334,8 +340,8 @@ export const site = {
     },
   },
   scene: {
-    neonTitle: "Lucas",
-    neonSubtitle: "black & gray · realismo",
+    neonTitle: "Tattoo",
+    neonSubtitle: "arte na pele",
     bottleLabel: "Black ink",
   },
 } as const satisfies SiteConfig;

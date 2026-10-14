@@ -9,7 +9,7 @@ import { canvasTexture, makeCanvas } from "./canvas";
 import { sceneState } from "./state";
 import { drawNeon } from "./textures";
 
-/** Letreiro "Lucas" atrás da máquina, sem tone mapping para o bloom pegar. */
+/** Letreiro de neon atrás da máquina (textos em site.scene), sem tone mapping para o bloom pegar. */
 export function Neon({ post }: { post: boolean }) {
   const { position, rotationY, size, canvas: canvasSize } = visual.neon;
   const glow = post ? visual.post.neonGlow : visual.neon.glow;
