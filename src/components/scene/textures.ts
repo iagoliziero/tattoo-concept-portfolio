@@ -1,7 +1,8 @@
 import { visual } from "@/config/visual";
-import { makeCanvas } from "./canvas";
+import { context2d, makeCanvas, type Canvas2D } from "./draw";
 
-// Texturas procedurais, portadas do protótipo.
+// Texturas procedurais, portadas do protótipo. Sem three.js: as maiores são
+// desenhadas num Web Worker (ver sceneTextures.ts).
 
 const rand = Math.random;
 
@@ -121,8 +122,8 @@ export function bottleLabelCanvas(text: string) {
 }
 
 /** Letreiro neon: letras em contorno com três camadas de brilho. */
-export function drawNeon(canvas: HTMLCanvasElement, displayFamily: string, title: string, subtitle: string) {
-  const g = canvas.getContext("2d")!;
+export function drawNeon(canvas: Canvas2D, displayFamily: string, title: string, subtitle: string) {
+  const g = context2d(canvas);
   const { width: w, height: h } = canvas;
   g.clearRect(0, 0, w, h);
   g.textAlign = "center";

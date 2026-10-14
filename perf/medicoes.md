@@ -116,3 +116,34 @@ Só o relatório da mediana fica no repositório (`perf/<etapa>.json`).
   de distância, desmontar ao sair) não se aplica: é uma cena só, contínua, com
   a câmera viajando entre as seções, sempre visível no fundo. A pausa com a
   aba oculta já existia.
+
+## Etapa 3 · texturas fora da thread principal
+
+Não há modelos .glb/.gltf, texturas em arquivo nem HDR para comprimir com
+gltf-transform: tudo é desenhado em canvas na hora. O equivalente aqui foi
+tirar esse desenho (pele 768×1120, relevo, madeira, gravação 1024×1024,
+bobinas, recartilhado, rótulo e as seis camadas da cicatrização) da thread
+principal: ele roda num Web Worker com OffscreenCanvas e volta como
+ImageBitmap. Sem worker (Safari antigo), desenha na página, uma textura por
+tarefa. A cicatrização não é sequência de imagens: são seis camadas
+compostas num canvas conforme o dia, e isso continua igual.
+
+Custo da cena ao entrar (celular emulado, CPU 4x, Chrome novo a cada rodada
+para o cache de shaders começar vazio; medianas de 3):
+
+| | Até o 1º quadro | Bloqueio | Maior tarefa |
+|---|---|---|---|
+| Etapa 2 | 9,52 s | 9,06 s | 6,73 s |
+| Etapa 3 | 9,75 s | 8,98 s | 6,45 s |
+
+- Praticamente empate: aqui a compilação de shaders (maior tarefa, o
+  primeiro quadro) domina tudo. Quando ela sair do caminho (etapa 4), o
+  desenho das texturas passa a ser uma fatia maior; o worker é reavaliado lá.
+- Armadilha encontrada no caminho: com o estúdio esperando as texturas, um
+  quadro era desenhado antes do mapa de ambiente existir e todos os shaders
+  compilavam duas vezes (12,8 s). O ambiente agora é gerado junto com o
+  canvas, enquanto o worker desenha, e os shaders compilam uma vez.
+- `willReadFrequently` (canvas na CPU) foi testado e não ajudou.
+- Visual conferido nas fotos de cada seção: pele, tatuagem do Dia 0 ao 30,
+  bancada e gravação da máquina iguais às da etapa 2.
+- O Lighthouse não muda (a cena não carrega durante a medição).

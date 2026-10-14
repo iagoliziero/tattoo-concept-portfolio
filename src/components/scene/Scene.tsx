@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, use, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
@@ -14,6 +14,7 @@ import { Dust } from "./Dust";
 import { Lights } from "./Lights";
 import { Machine } from "./Machine";
 import { Neon } from "./Neon";
+import { loadSceneTextures, SceneTexturesContext } from "./sceneTextures";
 import { SessionDirector } from "./SessionDirector";
 import { StudioEnvironment } from "./StudioEnvironment";
 import { Tattoo } from "./Tattoo";
@@ -68,6 +69,30 @@ function DevHandle() {
   return null;
 }
 
+/** O estúdio, a pele e a máquina: esperam as texturas procedurais ficarem prontas. */
+function StudioContents({ post, light }: { post: boolean; light: boolean }) {
+  const textures = use(loadSceneTextures());
+  const { renderer, lightMode } = visual;
+
+  return (
+    <SceneTexturesContext value={textures}>
+      <Backdrop post={post} />
+      <Lights post={post} shadowMapSize={light ? lightMode.shadowMapSize : renderer.shadowMapSize} />
+      <Neon post={post} />
+      <Workbench />
+      <Arm />
+      <Tattoo />
+      <Machine />
+      <InkMist />
+      <Dust count={light ? lightMode.dust : visual.dust.count} />
+    </SceneTexturesContext>
+  );
+}
+
+// As texturas começam a ser desenhadas (num worker) assim que este chunk
+// carrega, junto com a criação do canvas WebGL.
+loadSceneTextures();
+
 export default function Scene({ onReady }: { onReady: () => void }) {
   const { fov, near, far } = visual.camera;
   const [light] = useState(detectLightMode);
@@ -90,26 +115,20 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       <Director />
       <SessionDirector />
       <CameraRig />
+      {/*
+        O mapa de ambiente é gerado já na criação do canvas, enquanto o worker
+        desenha as texturas: quando o estúdio monta, os materiais nascem com
+        ele e os shaders compilam uma vez só. A cena só aparece com as texturas
+        e o pós-processamento (se houver) prontos: nada troca de visual na
+        frente de ninguém.
+      */}
       <StudioEnvironment>
-        <Backdrop post={post} />
-        <Lights post={post} shadowMapSize={light ? lightMode.shadowMapSize : renderer.shadowMapSize} />
-        <Neon post={post} />
-        <Workbench />
-        <Arm />
-        <Tattoo />
-        <Machine />
-        <InkMist />
-        <Dust count={light ? lightMode.dust : visual.dust.count} />
-      </StudioEnvironment>
-      {/* Com pós-processamento, a cena só aparece depois que ele chegou, para não trocar de visual na frente de ninguém. */}
-      {post ? (
         <Suspense fallback={null}>
-          <PostProcessing />
+          <StudioContents post={post} light={light} />
+          {post && <PostProcessing />}
           <ReadySignal frames={2} onReady={onReady} />
         </Suspense>
-      ) : (
-        <ReadySignal frames={2} onReady={onReady} />
-      )}
+      </StudioEnvironment>
       {process.env.NODE_ENV === "development" && <DevHandle />}
     </Canvas>
   );

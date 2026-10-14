@@ -8,6 +8,7 @@ import { stage } from "@/lib/stage";
 import { smoothstep } from "./canvas";
 import { LABELED_PARTS, machineLabels } from "./labels";
 import { buildMachine, MACHINE_PARTS, NEEDLE_REST_Y } from "./machineModel";
+import { useSceneTextures } from "./sceneTextures";
 import { sceneState } from "./state";
 
 const point = new Vector3();
@@ -25,7 +26,8 @@ function settle(t: number, overshoot: number) {
  * abertura e se abre na vista explodida, com as etiquetas projetadas na tela.
  */
 export function Machine() {
-  const model = useMemo(() => buildMachine(), []);
+  const sources = useSceneTextures();
+  const model = useMemo(() => buildMachine(sources), [sources]);
   useEffect(() => model.dispose, [model]);
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);

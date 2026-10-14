@@ -1,15 +1,8 @@
 import { CanvasTexture, Color, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, SRGBColorSpace } from "three";
 import type { LightColor } from "@/config/visual";
+import type { Canvas2D } from "./draw";
 
-type Draw = (g: CanvasRenderingContext2D, w: number, h: number) => void;
-
-export function makeCanvas(width: number, height: number, draw?: Draw) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  if (draw) draw(canvas.getContext("2d")!, width, height);
-  return canvas;
-}
+export { makeCanvas } from "./draw";
 
 /**
  * Textura de canvas. `srgb` para cores; mapas de relevo ficam lineares.
@@ -17,7 +10,7 @@ export function makeCanvas(width: number, height: number, draw?: Draw) {
  * visíveis de longe, ao custo de um leve serrilhado.
  */
 export function canvasTexture(
-  canvas: HTMLCanvasElement,
+  canvas: Canvas2D,
   { srgb = false, repeat, sharp = false }: { srgb?: boolean; repeat?: readonly [number, number]; sharp?: boolean } = {},
 ) {
   const texture = new CanvasTexture(canvas);

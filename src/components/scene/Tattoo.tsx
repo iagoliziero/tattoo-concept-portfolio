@@ -7,8 +7,8 @@ import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
 import { ARM_RADIUS, TATTOO_PATCH } from "./armGeometry";
 import { canvasTexture } from "./canvas";
+import { useSceneTextures } from "./sceneTextures";
 import { useStudioEnvironment } from "./StudioEnvironment";
-import { TATTOO_STROKES } from "./tattooArt";
 import { createTattooSurface } from "./tattooSurface";
 
 /**
@@ -20,10 +20,11 @@ export function Tattoo() {
   const environment = useStudioEnvironment();
   const material = useRef<MeshPhysicalMaterial>(null);
   const shown = useRef(-1);
+  const { tattoo } = useSceneTextures();
   const { surface, texture } = useMemo(() => {
-    const surface = createTattooSurface(TATTOO_STROKES);
+    const surface = createTattooSurface(tattoo);
     return { surface, texture: canvasTexture(surface.canvas, { srgb: true }) };
-  }, []);
+  }, [tattoo]);
   useEffect(() => () => texture.dispose(), [texture]);
 
   useFrame(() => {

@@ -8,13 +8,16 @@
 //    Dia 30), e os erros do console.
 //
 // Uso: node scripts/testar-cena.mjs [url] [pasta das fotos]
+//      node scripts/testar-cena.mjs [url] --custo N   (só o custo de entrada, N vezes, com a mediana)
 
 import { mkdir, writeFile } from "node:fs/promises";
 import puppeteer from "puppeteer-core";
 import { chromePath, viewports } from "./chrome.mjs";
 
 const url = process.argv[2] ?? "http://localhost:3000";
-const out = process.argv[3] ?? "perf/telas";
+const costOnly = process.argv[3] === "--custo";
+const repeats = costOnly ? Number(process.argv[4] ?? 3) : 1;
+const out = costOnly ? "perf/telas" : (process.argv[3] ?? "perf/telas");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const READY = '[data-scene][data-ready="true"]';
 
@@ -22,7 +25,7 @@ function collectErrors(page) {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
+    if (message.type() === "error" || message.type() === "warn") errors.push(`${message.type()}: ${message.text()}`);
   });
   return errors;
 }
@@ -42,6 +45,9 @@ const blocking = (tasks) => Math.round(tasks.reduce((sum, [, duration]) => sum +
 async function entryCost(browser) {
   const page = await browser.newPage();
   const errors = collectErrors(page);
+  // Texturas desenhadas num Web Worker (sceneTextures.ts): conta quantos a página criou.
+  let workers = 0;
+  page.on("workercreated", () => (workers += 1));
   await page.setViewport(viewports.mobile);
   const cdp = await page.createCDPSession();
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
@@ -67,6 +73,9 @@ async function entryCost(browser) {
       tarefasLongas: after.length,
       bloqueioMs: blocking(after),
       maiorTarefaMs: Math.round(Math.max(0, ...after.map(([, duration]) => duration))),
+      workers,
+      /** [início depois do gatilho, duração], em ms. */
+      tarefas: after.map(([start, duration]) => [Math.round(start - wokeAt), Math.round(duration)]),
     },
     erros: errors,
   };
@@ -104,6 +113,22 @@ async function screens(browser, name, viewport) {
 await mkdir(out, { recursive: true });
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true });
 try {
+  if (costOnly) {
+    // Um Chrome novo (perfil temporário) por rodada: o cache de shaders começa
+    // vazio, como na primeira visita de alguém. No mesmo navegador, a segunda
+    // rodada reaproveitaria os shaders já compilados.
+    const runs = [];
+    for (let i = 0; i < repeats; i++) {
+      const fresh = await puppeteer.launch({ executablePath: chromePath(), headless: true });
+      const { entradaDaCena, erros } = await entryCost(fresh);
+      await fresh.close();
+      runs.push(entradaDaCena);
+      console.log(JSON.stringify({ ...entradaDaCena, erros }));
+    }
+    const median = [...runs].sort((a, b) => a.bloqueioMs - b.bloqueioMs)[Math.floor(runs.length / 2)];
+    console.log("Mediana pelo bloqueio:", JSON.stringify(median));
+    process.exit(0);
+  }
   const cost = await entryCost(browser);
   const mobileErrors = await screens(browser, "mobile", viewports.mobile);
   const desktopErrors = await screens(browser, "desktop", viewports.desktop);

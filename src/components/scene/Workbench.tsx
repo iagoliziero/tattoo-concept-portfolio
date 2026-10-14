@@ -2,20 +2,20 @@
 
 import { useEffect, useMemo } from "react";
 import { DoubleSide, MeshPhysicalMaterial } from "three";
-import { site } from "@/config/site";
 import { visual } from "@/config/visual";
 import { canvasTexture } from "./canvas";
+import { useSceneTextures } from "./sceneTextures";
 import { useStudioEnvironment } from "./StudioEnvironment";
-import { bottleLabelCanvas, woodCanvas } from "./textures";
 
 /** Bancada de madeira envernizada, batoques de tinta e frascos "Black ink". */
 export function Workbench() {
   const { table, inkCaps, bottles } = visual;
   const environment = useStudioEnvironment();
+  const sources = useSceneTextures();
   const { wood, label, cupMaterial } = useMemo(
     () => ({
-      wood: canvasTexture(woodCanvas(), { srgb: true, repeat: table.repeat }),
-      label: canvasTexture(bottleLabelCanvas(site.scene.bottleLabel), { srgb: true }),
+      wood: canvasTexture(sources.wood, { srgb: true, repeat: table.repeat }),
+      label: canvasTexture(sources.label, { srgb: true }),
       // Plástico translúcido dos batoques e dos bicos dos frascos.
       cupMaterial: new MeshPhysicalMaterial({
         color: visual.colors.text,
@@ -27,7 +27,7 @@ export function Workbench() {
         clearcoat: 0.5,
       }),
     }),
-    [table.repeat],
+    [sources, table.repeat],
   );
   useEffect(
     () => () => {

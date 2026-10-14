@@ -1,20 +1,37 @@
 import { visual, type HealingLayers } from "@/config/visual";
 import { surfacePoint, TATTOO_PATCH, type SurfacePoint } from "./armGeometry";
-import { makeCanvas } from "./canvas";
+import { context2d, makeCanvas, type Canvas2D, type Context2D } from "./draw";
 import type { Stroke } from "./tattooArt";
 
 // A tatuagem na pele: o desenho em tinta e as camadas da cicatrização,
-// pré-calculadas a partir dele e compostas num canvas quando o dia muda.
+// pré-calculadas a partir dele (tattooLayers, que roda num Web Worker) e
+// compostas num canvas da página quando o dia muda (createTattooSurface).
 
 const { width: W, height: H } = TATTOO_PATCH;
 // Centro e raio da região inflamada, em pixels do canvas (protótipo).
 const SWELL = { x: 386, y: 305, squash: 0.42, radius: 380 };
 
-const supportsFilter =
-  typeof CanvasRenderingContext2D !== "undefined" && "filter" in CanvasRenderingContext2D.prototype;
+/** As camadas da cicatrização: canvases no desenho, ImageBitmaps vindos do worker. */
+export interface TattooLayers<T = Canvas2D> {
+  ink: T;
+  swollen: T;
+  redness: T;
+  milk: T;
+  flakes: T;
+  gloss: T;
+}
+
+// Na página o contexto é CanvasRenderingContext2D; no worker, o do OffscreenCanvas.
+const Context2DClass =
+  typeof CanvasRenderingContext2D !== "undefined"
+    ? CanvasRenderingContext2D
+    : typeof OffscreenCanvasRenderingContext2D !== "undefined"
+      ? OffscreenCanvasRenderingContext2D
+      : null;
+const supportsFilter = Context2DClass !== null && "filter" in Context2DClass.prototype;
 
 /** Desfoque; sem ctx.filter (Safari), aproxima reduzindo e ampliando a imagem. */
-function blurred(source: HTMLCanvasElement, px: number) {
+function blurred(source: Canvas2D, px: number) {
   if (supportsFilter) {
     return makeCanvas(W, H, (g) => {
       g.filter = `blur(${px}px)`;
@@ -32,7 +49,7 @@ function blurred(source: HTMLCanvasElement, px: number) {
   });
 }
 
-function tinted(source: HTMLCanvasElement, color: string) {
+function tinted(source: Canvas2D, color: string) {
   return makeCanvas(W, H, (g) => {
     g.drawImage(source, 0, 0);
     g.globalCompositeOperation = "source-in";
@@ -42,7 +59,7 @@ function tinted(source: HTMLCanvasElement, color: string) {
 }
 
 /** Mancha elíptica centrada na tatuagem (vermelhidão e máscara do brilho). */
-function swellSpot(g: CanvasRenderingContext2D, inner: number, from: string, to: string) {
+function swellSpot(g: Context2D, inner: number, from: string, to: string) {
   g.save();
   g.translate(SWELL.x, SWELL.y);
   g.scale(1, SWELL.squash);
@@ -86,7 +103,8 @@ function inkCanvas(strokes: Stroke[]) {
   });
 }
 
-export function createTattooSurface(strokes: Stroke[]) {
+/** As camadas da cicatrização, desenhadas a partir dos traços. Não toca na página: roda no worker. */
+export function tattooLayers(strokes: Stroke[]): TattooLayers {
   const ink = inkCanvas(strokes);
 
   // Traço levemente borrado pelo inchaço
@@ -148,8 +166,13 @@ export function createTattooSurface(strokes: Stroke[]) {
     swellSpot(g, 30, "#000", "rgba(0,0,0,0)");
   });
 
+  return { ink, swollen, redness, milk, flakes, gloss };
+}
+
+/** O canvas da pele tatuada e como compô-lo em cada dia, a partir das camadas prontas. */
+export function createTattooSurface({ ink, swollen, redness, milk, flakes, gloss }: TattooLayers<CanvasImageSource>) {
   const composite = makeCanvas(W, H);
-  const out = composite.getContext("2d")!;
+  const out = context2d(composite);
   const stages = visual.healing;
 
   /**
