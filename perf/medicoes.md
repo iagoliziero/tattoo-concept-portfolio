@@ -92,3 +92,27 @@ Só o relatório da mediana fica no repositório (`perf/<etapa>.json`).
   dele (0,17–0,33 s com o Chrome já aberto): parte do atraso é o Chrome frio
   que o Lighthouse abre a cada rodada. Uma página HTML trivial pinta em 92 ms
   no mesmo ambiente, então o resto vem do trabalho de JS antes da pintura.
+
+## Etapa 2 · partes da cena sob demanda
+
+| Rodada | Nota | FCP | LCP | TBT | CLS | Speed Index | JS na carga |
+|---|---|---|---|---|---|---|---|
+| 1 | 71 | 1,46 s | 2,64 s | 1 247 ms | 0 | 3,49 s | 200 KB |
+| 2 | 83 | 1,36 s | 2,79 s | 418 ms | 0 | 4,06 s | 200 KB |
+| 3 (mediana) | **81** | 1,43 s | 2,84 s | 498 ms | 0 | 4,07 s | 200 KB |
+
+- O pós-processamento (bloom, grão, vinheta, aberração) só existe fora do
+  modo leve e agora vem num chunk próprio (20 KB comprimido, 75 KB bruto),
+  que o celular nunca baixa. O JS 3D do celular foi de 269 para 253 KB
+  comprimido. Com pós-processamento, a cena só aparece depois que ele chegou,
+  então o visual não troca na frente de ninguém. `perf/bundle-etapa2.txt`.
+- Three.js não está no carregamento inicial (`next analyze`): fica num chunk
+  assíncrono que só é pedido quando a cena acorda.
+- A carga medida pelo Lighthouse é a mesma da etapa 1 (mesmos scripts; um
+  chunk de 6,5 KB com as referências dos imports mudou 28 bytes). A queda de
+  85 para 81 é ruído: a máquina estava com pouca memória livre (1–3 GB de
+  8 GB) e a rodada 1 teve um TBT fora da curva. Por isso não foi revertida.
+- O que o roteiro pedia ao pé da letra (uma cena por seção, montar a ~1 tela
+  de distância, desmontar ao sair) não se aplica: é uma cena só, contínua, com
+  a câmera viajando entre as seções, sempre visível no fundo. A pausa com a
+  aba oculta já existia.

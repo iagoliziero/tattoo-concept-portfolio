@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { visual } from "@/config/visual";
 import { stage } from "@/lib/stage";
@@ -14,12 +14,15 @@ import { Dust } from "./Dust";
 import { Lights } from "./Lights";
 import { Machine } from "./Machine";
 import { Neon } from "./Neon";
-import { PostProcessing } from "./post/PostProcessing";
 import { SessionDirector } from "./SessionDirector";
 import { StudioEnvironment } from "./StudioEnvironment";
 import { Tattoo } from "./Tattoo";
 import { sceneState } from "./state";
 import { Workbench } from "./Workbench";
+
+// O pós-processamento só roda fora do modo leve: vem num chunk próprio, que o
+// celular nunca baixa.
+const PostProcessing = lazy(() => import("./post/PostProcessing").then((m) => ({ default: m.PostProcessing })));
 
 /** Pausa a renderização com a aba oculta. */
 function PauseWhenHidden() {
@@ -84,7 +87,6 @@ export default function Scene({ onReady }: { onReady: () => void }) {
     >
       <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
       <PauseWhenHidden />
-      <ReadySignal frames={2} onReady={onReady} />
       <Director />
       <SessionDirector />
       <CameraRig />
@@ -99,7 +101,15 @@ export default function Scene({ onReady }: { onReady: () => void }) {
         <InkMist />
         <Dust count={light ? lightMode.dust : visual.dust.count} />
       </StudioEnvironment>
-      {post && <PostProcessing />}
+      {/* Com pós-processamento, a cena só aparece depois que ele chegou, para não trocar de visual na frente de ninguém. */}
+      {post ? (
+        <Suspense fallback={null}>
+          <PostProcessing />
+          <ReadySignal frames={2} onReady={onReady} />
+        </Suspense>
+      ) : (
+        <ReadySignal frames={2} onReady={onReady} />
+      )}
       {process.env.NODE_ENV === "development" && <DevHandle />}
     </Canvas>
   );
