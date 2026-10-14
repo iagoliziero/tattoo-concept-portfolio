@@ -67,7 +67,9 @@ podem ser trocados em `site.ts`.
 - Em celulares e telas de toque a cena entra em modo leve (sem MSAA e bloom,
   menos partículas). Com `prefers-reduced-motion`, não há vibração, tremores,
   cursor próprio nem respingos, e a máquina já aparece montada.
-- A seção Cura fica fixa por 3 alturas de tela: rolar avança ou volta os dias
-  (`visual.scroll.healingHold`).
+- A Cura anda em etapas: cada gesto (roda, trackpad, swipe, setas) avança ou
+  volta um dia; no Dia 30 o próximo gesto para baixo segue para os Trabalhos e,
+  no Dia 0, um para cima volta à Sessão (`visual.scroll.healingStep`).
+- Os links do menu pulam direto para a seção, sem animar as do caminho.
 - O aviso "THREE.Clock deprecated" no console vem de dentro do
   `@react-three/fiber`, não do código do site.

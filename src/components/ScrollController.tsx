@@ -17,8 +17,9 @@ const LAST_DAY = visual.healing.length - 1;
  * mover câmera e máquina. Ao parar no meio de uma passagem, a página encaixa
  * na seção mais próxima, como o protótipo fazia.
  *
- * A Cura fica fixa por mais tempo (healingHold): a rolagem dentro dela avança
- * ou volta os dias da cicatrização, e só depois do último dia a página segue.
+ * A Cura fica fixa por mais tempo (healingHold) e anda em etapas: cada gesto
+ * avança ou volta um dia (ver healingSteps). Só depois do último dia (ou antes
+ * do primeiro, subindo) a página segue para a seção vizinha.
  */
 export function ScrollController() {
   useGSAP(() => {
@@ -64,14 +65,12 @@ export function ScrollController() {
       if (y >= pins[HEALING - 1].end) stage.setHeal(healAt(y));
     };
 
-    // Controle da linha do tempo: rola até o dia pedido.
-    stage.setHealSeeker((heal, smooth) => {
-      const t = Math.min(1, Math.max(0, heal / LAST_DAY));
-      window.scrollTo({
-        top: healing.start + t * (healing.end - healing.start),
-        behavior: smooth && !reduceMotion ? "smooth" : "auto",
-      });
+    const steps = healingSteps(healing, reduceMotion, {
+      up: () => pins[HEALING - 1].end,
+      down: () => pins[HEALING + 1].start + 1,
     });
+    // Controle da linha do tempo: vai até o dia pedido.
+    stage.setHealSeeker((heal, smooth) => steps.goTo(Math.round(heal), smooth));
 
     ScrollTrigger.create({
       start: 0,
@@ -81,7 +80,10 @@ export function ScrollController() {
       snap: {
         snapTo: (value) => {
           const max = ScrollTrigger.maxScroll(window);
-          const p = progressAt(value * max);
+          const y = value * max;
+          // Na Cura, para sempre num dia (barra de rolagem, inércia do celular).
+          if (steps.inside(y)) return steps.yOf(steps.stepAt(y)) / max;
+          const p = progressAt(y);
           const i = Math.round(p);
           if (p === i) return value;
           return (i > p ? pins[i].start : pins[i].end) / max;
@@ -101,6 +103,7 @@ export function ScrollController() {
       const i = sections.findIndex((section) => `#${section.id}` === href);
       if (i < 0) return;
       event.preventDefault();
+      steps.stop();
       window.scrollTo({ top: pins[i].start + 1, behavior: "instant" });
       update();
       stage.cut();
@@ -108,9 +111,149 @@ export function ScrollController() {
     document.addEventListener("click", onClick);
     return () => {
       document.removeEventListener("click", onClick);
+      steps.dispose();
       stage.setHealSeeker(null);
     };
   });
 
   return null;
+}
+
+type Mode = "none" | "step" | "native";
+
+/**
+ * Cura em etapas. Dentro do trecho fixo da Cura, roda do mouse, trackpad,
+ * swipe e teclado não rolam a página: cada gesto leva ao dia seguinte (ou ao
+ * anterior), numa transição animada, e novos avanços ficam bloqueados até ela
+ * terminar e o gesto acabar (a inércia do trackpad conta como o mesmo gesto).
+ * No último dia, um novo gesto para baixo leva à próxima seção (exits.down);
+ * no primeiro, um gesto para cima volta à anterior (exits.up). Dali em diante
+ * a rolagem é a da página.
+ */
+function healingSteps(
+  healing: ScrollTrigger,
+  reduceMotion: boolean,
+  exits: { up: () => number; down: () => number },
+) {
+  const { duration, gestureGap, swipe } = visual.scroll.healingStep;
+  const stepLength = () => (healing.end - healing.start) / LAST_DAY;
+  const yOf = (k: number) => healing.start + k * stepLength();
+  const stepAt = (y: number) => Math.min(LAST_DAY, Math.max(0, Math.round((y - healing.start) / stepLength())));
+  const inside = (y: number) => y >= healing.start - 1 && y <= healing.end + 1;
+
+  let tween: gsap.core.Tween | null = null;
+  let target = -1;
+  // Como o gesto atual está sendo usado: ainda nada, já avançou uma etapa, ou
+  // rolando a página (chegou de fora da Cura ou está saindo dela).
+  let mode: Mode = "none";
+  let lastWheel = -Infinity;
+  let touchY = 0;
+
+  const stop = () => {
+    tween?.kill();
+    tween = null;
+  };
+  const glide = (y: number, smooth = true) => {
+    stop();
+    if (!smooth || reduceMotion) {
+      window.scrollTo({ top: y, behavior: "instant" });
+      return;
+    }
+    const scroll = { y: window.scrollY };
+    tween = gsap.to(scroll, {
+      y,
+      duration,
+      ease: "power2.inOut",
+      onUpdate: () => window.scrollTo({ top: scroll.y, behavior: "instant" }),
+      onComplete: () => {
+        tween = null;
+      },
+    });
+  };
+  const goTo = (k: number, smooth = true) => {
+    k = Math.min(LAST_DAY, Math.max(0, k));
+    if (tween && target === k) return;
+    glide(yOf(k), smooth);
+    target = k;
+  };
+
+  /** Um movimento na direção `dir` (1 desce, -1 sobe). `ready`: já conta como gesto. */
+  const handle = (dir: 1 | -1, prevent: () => void, ready: boolean) => {
+    // Gesto já usado (ou transição em curso): o resto dele não faz nada.
+    if (tween || mode === "step") {
+      prevent();
+      return;
+    }
+    const y = window.scrollY;
+    if (!inside(y)) {
+      if (mode === "none") mode = "native";
+      return;
+    }
+    const k = stepAt(y);
+    const leaving = (k === LAST_DAY && dir > 0) || (k === 0 && dir < 0);
+    if (mode === "native") {
+      // Gesto que veio de fora: para no dia mais próximo e espera o próximo.
+      if (leaving) return;
+      prevent();
+      if (Math.abs(y - yOf(k)) > 1) goTo(k);
+      return;
+    }
+    prevent();
+    if (!ready) return;
+    mode = "step";
+    if (!leaving) goTo(k + dir);
+    else {
+      target = -1;
+      glide(dir > 0 ? exits.down() : exits.up());
+    }
+  };
+
+  const onWheel = (event: WheelEvent) => {
+    if (event.ctrlKey || event.deltaY === 0 || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+    // Pausa entre eventos encerra o gesto; a inércia do trackpad não pausa.
+    if (event.timeStamp - lastWheel > gestureGap * 1000) mode = "none";
+    lastWheel = event.timeStamp;
+    handle(event.deltaY > 0 ? 1 : -1, () => event.preventDefault(), true);
+  };
+
+  const onTouchStart = (event: TouchEvent) => {
+    touchY = event.touches[0].clientY;
+    mode = "none";
+  };
+  const onTouchMove = (event: TouchEvent) => {
+    if (event.touches.length > 1) return;
+    const dy = touchY - event.touches[0].clientY;
+    if (dy === 0) return;
+    handle(dy > 0 ? 1 : -1, () => event.cancelable && event.preventDefault(), Math.abs(dy) >= swipe);
+  };
+
+  const onKey = (event: KeyboardEvent) => {
+    const el = event.target as HTMLElement | null;
+    if (el?.closest("input, textarea, select, [contenteditable]") || event.altKey || event.ctrlKey || event.metaKey) return;
+    const down = event.key === "ArrowDown" || event.key === "PageDown" || (event.key === " " && !event.shiftKey);
+    const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
+    if (!down && !up) return;
+    if (!event.repeat) mode = "none";
+    handle(down ? 1 : -1, () => event.preventDefault(), true);
+  };
+
+  window.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("touchstart", onTouchStart, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: false });
+  window.addEventListener("keydown", onKey);
+
+  return {
+    inside,
+    stepAt,
+    yOf,
+    goTo,
+    stop,
+    dispose() {
+      stop();
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKey);
+    },
+  };
 }

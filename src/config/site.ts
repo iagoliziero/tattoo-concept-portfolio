@@ -141,7 +141,7 @@ const artist = {
   instagram: {
     handle: "@tattoolucas",
     url: "https://www.instagram.com/tattoolucas/",
-    followers: { value: 160, suffix: " mil+" },
+    followers: { value: 130, suffix: " mil+" },
   },
   address: null,
   whatsapp: null,

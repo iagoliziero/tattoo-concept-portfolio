@@ -6,8 +6,8 @@ import ui from "../ui.module.css";
 import styles from "./sections.module.css";
 
 /**
- * Dia atual, dica de cuidado e a linha do tempo. O dia segue a rolagem da
- * página; arrastar o controle (ou usar as setas) rola até o dia escolhido.
+ * Dia atual, dica de cuidado e a linha do tempo. O dia muda um por vez com a
+ * rolagem; arrastar o controle (ou usar as setas) leva ao dia mais próximo.
  */
 export function HealingTimeline() {
   const { healing } = site;
@@ -36,7 +36,7 @@ export function HealingTimeline() {
           const next = forward ? Math.floor(heal + 1e-6) + 1 : Math.ceil(heal - 1e-6) - 1;
           stage.seekHeal(Math.min(last, Math.max(0, next)));
         }}
-        onChange={(event) => stage.seekHeal(Number(event.target.value) / 100, false)}
+        onChange={(event) => stage.seekHeal(Number(event.target.value) / 100)}
         aria-label={healing.sliderLabel}
         aria-valuetext={current.title}
         className={styles.range}

@@ -135,6 +135,13 @@ export interface VisualConfig {
      * (ou volta) os dias da cicatrização. Em alturas de tela.
      */
     healingHold: number;
+    /**
+     * Cura em etapas: cada gesto (roda, trackpad, swipe, tecla) avança ou volta
+     * um dia. duration: transição entre dias (s); gestureGap: pausa sem eventos
+     * que encerra um gesto (s), para a inércia do trackpad contar como um só;
+     * swipe: quanto o dedo precisa andar para contar (px).
+     */
+    healingStep: { duration: number; gestureGap: number; swipe: number };
     /** Espera depois que a rolagem para, antes de encaixar na seção (s). */
     snapDelay: number;
     snapDuration: { min: number; max: number };
@@ -462,6 +469,7 @@ export const visual = {
     sections: 6,
     holdRatio: 0.6,
     healingHold: 3,
+    healingStep: { duration: 0.7, gestureGap: 0.2, swipe: 24 },
     snapDelay: 0.2,
     snapDuration: { min: 0.3, max: 0.8 },
   },
