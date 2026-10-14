@@ -2,7 +2,7 @@
    para acompanhar a largura da tela, do celular ao monitor grande. */
 
 .kicker {
-  font-size: clamp(14px, 0.4vw + 12px, 17px);
+  font-size: clamp(14px, 0.45vw + 11px, 21px);
   letter-spacing: 0.14em;
   color: var(--c-red);
   margin: 0 0 12px;
@@ -23,15 +23,15 @@
 }
 
 .text {
-  font-size: clamp(17px, 0.6vw + 13px, 21px);
+  font-size: clamp(17px, 0.75vw + 11px, 27px);
   line-height: 1.6;
   color: var(--c-text-secondary);
   margin: 0;
-  max-width: 520px;
+  max-width: clamp(480px, 34vw, 720px);
 }
 
 .text.compact {
-  font-size: clamp(16px, 0.5vw + 13px, 19px);
+  font-size: clamp(16px, 0.65vw + 10px, 24px);
 }
 
 .button {
@@ -40,9 +40,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 22px;
-  font-size: 16px;
+  min-height: clamp(48px, 1.6vw + 24px, 64px);
+  padding: 0 clamp(22px, 1.2vw, 30px);
+  font-size: clamp(16px, 0.55vw + 8px, 21px);
   font-weight: 600;
   border-radius: var(--radius);
   text-decoration: none;
@@ -81,9 +81,9 @@
 
 .chip {
   pointer-events: auto;
-  min-height: 40px;
-  padding: 0 18px;
-  font-size: 16px;
+  min-height: clamp(40px, 1.2vw + 22px, 52px);
+  padding: 0 clamp(18px, 1vw, 24px);
+  font-size: clamp(16px, 0.45vw + 9px, 20px);
   border-radius: 999px;
   background: var(--c-chip-bg);
   color: var(--c-text-secondary);
@@ -101,9 +101,9 @@
 .field {
   pointer-events: auto;
   width: 100%;
-  height: 48px;
+  height: clamp(48px, 1.4vw + 26px, 60px);
   padding: 0 14px;
-  font-size: 16px;
+  font-size: clamp(16px, 0.4vw + 10px, 20px);
   border-radius: var(--radius);
   background: var(--c-field-bg);
   color: var(--c-text);
@@ -121,7 +121,7 @@
 }
 
 .error {
-  font-size: 14px;
+  font-size: clamp(14px, 0.3vw + 10px, 17px);
   color: var(--c-error);
   margin: 4px 0 0;
 }

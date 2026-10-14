@@ -451,7 +451,7 @@ export const visual = {
     mono: "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace",
   },
   layout: {
-    headerHeight: 64,
+    headerHeight: 72,
     radius: 8,
     panelRadius: 10,
     minStageHeight: 560,

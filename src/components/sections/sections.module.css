@@ -25,7 +25,7 @@
 
 .small {
   margin: 0 0 14px;
-  font-size: clamp(16px, 0.5vw + 13px, 19px);
+  font-size: clamp(16px, 0.65vw + 10px, 24px);
   line-height: 1.55;
   color: var(--c-text-body);
 }
@@ -45,7 +45,7 @@
 
 .heroTitle {
   margin: 0 0 18px;
-  font-size: clamp(56px, 9vw, 128px);
+  font-size: clamp(56px, 9vw, 180px);
   line-height: 0.9;
 }
 
@@ -65,7 +65,7 @@
   align-items: center;
   gap: 8px;
   margin: 28px 0 0;
-  font-size: 16px;
+  font-size: clamp(16px, 0.5vw + 8px, 20px);
   color: var(--c-text-body);
 }
 
@@ -84,12 +84,12 @@
 /* Sessão */
 
 .sessionPanel {
-  max-width: 440px;
+  max-width: clamp(400px, 28vw, 600px);
 }
 
 .sessionTitle {
   margin: 0 0 8px;
-  font-size: clamp(34px, 3vw, 46px);
+  font-size: clamp(34px, 3.2vw, 64px);
   line-height: 1;
 }
 
@@ -98,7 +98,7 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: clamp(15px, 0.4vw + 9px, 19px);
   color: var(--c-text-secondary);
 }
 
@@ -156,24 +156,24 @@
 /* Ciclo de vida */
 
 .healingPanel {
-  max-width: 480px;
+  max-width: clamp(440px, 30vw, 640px);
 }
 
 .healingTitle {
   margin: 0 0 8px;
-  font-size: clamp(34px, 3.2vw, 48px);
+  font-size: clamp(34px, 3.4vw, 68px);
   line-height: 1;
 }
 
 .stageTitle {
   margin: 0 0 6px;
-  font-size: clamp(24px, 2vw, 30px);
+  font-size: clamp(24px, 2.1vw, 42px);
 }
 
 .stageTip {
   min-height: 76px;
   margin: 0 0 16px;
-  font-size: clamp(16px, 0.5vw + 13px, 19px);
+  font-size: clamp(16px, 0.65vw + 10px, 24px);
   line-height: 1.5;
   color: var(--c-text-secondary);
 }
@@ -189,13 +189,13 @@
   justify-content: space-between;
   margin-top: 4px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: clamp(13px, 0.35vw + 8px, 17px);
   color: var(--c-text-muted);
 }
 
 .disclaimer {
   margin: 14px 0 0;
-  font-size: 13px;
+  font-size: clamp(13px, 0.35vw + 8px, 17px);
   color: var(--c-text-muted);
 }
 
@@ -209,13 +209,13 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  max-width: 980px;
+  max-width: 1500px;
   margin-bottom: 18px;
 }
 
 .portfolioTitle {
   margin: 0;
-  font-size: clamp(36px, 3.8vw, 56px);
+  font-size: clamp(36px, 3.8vw, 76px);
   line-height: 1;
 }
 
@@ -229,7 +229,7 @@
   display: grid;
   grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
   gap: clamp(8px, 1.2vw, 16px);
-  width: min(100%, calc((100svh - 320px) * 0.4 * var(--columns) + 48px));
+  width: min(100%, calc((100svh - 300px) * 0.4 * var(--columns) + 48px));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -284,14 +284,14 @@ button.card {
 }
 
 .cardTitle {
-  font-size: clamp(15px, 0.6vw + 12px, 21px);
+  font-size: clamp(15px, 0.75vw + 9px, 26px);
   font-weight: 700;
   line-height: 1.2;
   color: var(--c-text);
 }
 
 .cardCaption {
-  font-size: clamp(12px, 0.3vw + 11px, 15px);
+  font-size: clamp(12px, 0.45vw + 8px, 18px);
   color: var(--c-text-secondary);
 }
 
@@ -301,7 +301,7 @@ button.card {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  width: min(100%, calc((100svh - 320px) * 0.4 * var(--columns) + 48px));
+  width: min(100%, calc((100svh - 300px) * 0.4 * var(--columns) + 48px));
   margin-top: 16px;
 }
 
@@ -310,7 +310,7 @@ button.card {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 9px, 21px);
   font-weight: 600;
   color: var(--c-text);
   text-decoration: none;
@@ -393,7 +393,7 @@ button.card {
 
 .aboutTitle {
   margin: 0 0 18px;
-  font-size: clamp(40px, 4.2vw, 60px);
+  font-size: clamp(40px, 4.2vw, 84px);
   line-height: 1;
 }
 
@@ -401,11 +401,11 @@ button.card {
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  max-width: 600px;
+  max-width: clamp(560px, 40vw, 860px);
 }
 
 .portrait {
-  flex: 0 0 clamp(120px, 12vw, 180px);
+  flex: 0 0 clamp(120px, 12vw, 240px);
   aspect-ratio: 4 / 5;
 }
 
@@ -413,7 +413,7 @@ button.card {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  max-width: 440px;
+  max-width: clamp(440px, 30vw, 640px);
   margin: 24px 0 0;
 }
 
@@ -424,32 +424,32 @@ button.card {
 
 .counterValue {
   margin: 0;
-  font-size: clamp(44px, 4vw, 60px);
+  font-size: clamp(44px, 4vw, 84px);
   line-height: 1;
 }
 
 .counterLabel {
   margin-top: 4px;
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 9px, 21px);
   color: var(--c-text-body);
 }
 
 .machineHint {
   margin: 20px 0 0;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: clamp(14px, 0.4vw + 8px, 18px);
   color: var(--c-text-body);
 }
 
 /* Contato */
 
 .contactPanel {
-  max-width: 500px;
+  max-width: clamp(460px, 32vw, 680px);
 }
 
 .contactTitle {
   margin: 0 0 8px;
-  font-size: clamp(36px, 3.6vw, 52px);
+  font-size: clamp(36px, 3.6vw, 72px);
   line-height: 1;
 }
 
@@ -461,8 +461,8 @@ button.card {
 
 .contactButton {
   flex: 1 1 200px;
-  min-height: 54px;
-  font-size: 17px;
+  min-height: clamp(54px, 1.8vw + 26px, 70px);
+  font-size: clamp(17px, 0.55vw + 9px, 22px);
 }
 
 .contactMeta {
@@ -470,7 +470,7 @@ button.card {
   flex-wrap: wrap;
   gap: 8px 18px;
   margin: 16px 0 0;
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 9px, 21px);
   color: var(--c-text-secondary);
 }
 
@@ -484,7 +484,7 @@ button.card {
   margin: 22px 0 10px;
   padding-top: 18px;
   border-top: 0.5px solid var(--c-border-soft);
-  font-size: 15px;
+  font-size: clamp(15px, 0.4vw + 9px, 19px);
   font-weight: 600;
   color: var(--c-text-body);
 }
@@ -527,7 +527,7 @@ button.card {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  font-size: 16px;
+  font-size: clamp(16px, 0.4vw + 10px, 20px);
   color: var(--c-text);
 }
 
@@ -569,7 +569,7 @@ button.card {
   align-items: center;
   gap: 10px;
   min-height: 20px;
-  font-size: 15px;
+  font-size: clamp(15px, 0.4vw + 9px, 19px);
   color: var(--c-success);
 }
 

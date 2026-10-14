@@ -17,7 +17,7 @@
 .brand {
   flex: none;
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: clamp(28px, 1.2vw + 12px, 38px);
   color: var(--c-text);
   text-decoration: none;
 }
@@ -36,9 +36,9 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  height: 36px;
-  padding: 0 11px;
-  font-size: 16px;
+  height: clamp(36px, 1vw + 20px, 46px);
+  padding: 0 clamp(11px, 0.6vw, 16px);
+  font-size: clamp(16px, 0.45vw + 9px, 20px);
   color: var(--c-text-body);
   text-decoration: none;
   border-radius: var(--radius);
@@ -51,7 +51,7 @@
 /* Contato em destaque: sempre à vista, como botão. */
 .cta {
   margin-left: 8px;
-  padding: 0 16px;
+  padding: 0 clamp(16px, 1vw, 24px);
   font-weight: 600;
   color: var(--c-on-red);
   background: var(--c-red);
