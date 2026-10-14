@@ -1,9 +1,10 @@
-# Tattoo Lucas
+# Tattoo Concept Portfolio
 
-Landing page e portfólio do tatuador Lucas Camargo (@tattoolucas): uma máquina
-de bobina em 3D que se monta sozinha, tatua o braço e mostra a cicatrização na
-pele conforme a página rola. Termina no contato, com pedido de orçamento e
-imagem de referência.
+Modelo de landing page e portfólio para tatuador: uma máquina de bobina em 3D
+que se monta sozinha, tatua o braço e mostra a cicatrização na pele conforme a
+página rola. Termina no contato, com pedido de orçamento e imagem de
+referência. Os dados do tatuador vêm de exemplo; para montar o site de um
+cliente, veja [Para um novo tatuador](#para-um-novo-tatuador).
 
 Next.js (App Router, TypeScript), React Three Fiber, drei,
 @react-three/postprocessing, three.js e GSAP ScrollTrigger. O protótipo
@@ -26,12 +27,32 @@ npm run lint
 | Textos, dados do tatuador, portfólio, formulário, domínio | `src/config/site.ts` |
 | Cores, fontes, câmera, luzes, materiais, animações, efeitos | `src/config/visual.ts` |
 | Fotos do portfólio (8, em duas linhas de 4) | `public/portfolio/tatto-ex1.jpg` a `tatto-ex8.jpg`; títulos e filtros em `site.ts` |
-| Foto do Lucas (retrato 4:5) | `public/lucas.jpg` |
+| Foto do tatuador (retrato 4:5) | `public/tatuador.jpg` |
 | Envio do pedido de orçamento | `src/lib/quote.ts` |
 | Desenho da tatuagem da sessão | `src/components/scene/tattooArt.ts` |
 
 Se alguma foto faltar, aparece um espaço reservado no lugar. Os caminhos
 podem ser trocados em `site.ts`.
+
+## Para um novo tatuador
+
+O modelo vem sem fotos e com dados de exemplo ("Nome Sobrenome", "Seu
+Estúdio", "Sua Cidade", "@seuinstagram"). Em `src/config/site.ts`:
+
+- `artist`: nome, marca (aparece no menu), cidade, estado, ano em que começou
+  (os anos de carreira são calculados), Instagram (perfil, link e
+  seguidores), endereço, WhatsApp e foto. O ícone do site usa a inicial do
+  nome.
+- `hero.titleLines`: o nome em duas linhas, no topo.
+- `about.story`: a história do tatuador.
+- `portfolio.filters` e `portfolio.items`: estilos, títulos, legendas e fotos
+  dos trabalhos.
+- `scene.neonTitle` e `scene.neonSubtitle`: o letreiro de neon atrás da
+  máquina.
+
+Enquanto o link do Instagram (`artist.instagram.url`) e o WhatsApp
+(`artist.whatsapp`) estiverem vazios, os botões de contato continuam no lugar,
+mas não levam a lugar nenhum.
 
 ## Antes de publicar
 
@@ -42,9 +63,11 @@ podem ser trocados em `site.ts`.
    serviço de formulário.
 2. **Domínio**: preencher `url` em `src/config/site.ts`. Sem ele, a imagem de
    compartilhamento sai com endereço relativo e o sitemap fica vazio.
-3. **Endereço e WhatsApp**: `artist.address` e `artist.whatsapp` em
-   `site.ts`. Com o WhatsApp preenchido, aparece o botão "Chamar no WhatsApp"
-   no contato; os dois entram nos dados estruturados (schema.org TattooParlor).
+3. **Contatos**: `artist.instagram.url`, `artist.whatsapp` e
+   `artist.address` em `site.ts`. Preenchidos, os botões "Chamar no
+   Instagram", "Chamar no WhatsApp" e "Ver todos os trabalhos no Instagram"
+   passam a abrir os contatos, e os três entram nos dados estruturados
+   (schema.org TattooParlor).
 
 ## Como está organizado
 

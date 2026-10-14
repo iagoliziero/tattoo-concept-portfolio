@@ -1,6 +1,6 @@
-# Landing page 3D — Lucas Camargo (@tattoolucas)
+# Landing page 3D — modelo para tatuador
 
-Quero criar a landing page/portfólio do tatuador Lucas Camargo: escura,
+Quero criar a landing page/portfólio de um tatuador: escura,
 cinematográfica, cheia de 3D e de interações criativas. A estrela é uma
 máquina de tatuar de bobina em 3D que se monta sozinha, desce até um braço,
 repassa uma tatuagem com zoom na agulha, mostra o ciclo de cicatrização na
@@ -31,16 +31,16 @@ parâmetros visuais ficam num arquivo de configuração tipado.
 =====================================================================
 ## 1. Dados do tatuador
 
-- Nome: Lucas Camargo · marca: "Tattoo Lucas" · Instagram @tattoolucas
-- São Paulo, SP · realismo e black & gray · carreira desde 2004 (calcular
-  anos automaticamente) · seguidores no Instagram (número editável)
-- História: veio do grafite, que guia sua composição; hoje quase só preto e
-  cinza, com peças exclusivas
-- Portfólio (fotos em /public/portfolio): Jesus (black & gray, religioso),
-  Odin (realismo, mitologia nórdica), Águia (black & gray, fauna), Armadura
-  (realismo, antebraço), Catrina (black & gray, chicano), Navio (black &
-  gray, marítimo)
-- Foto do tatuador 4:5. A preencher: endereço do estúdio, WhatsApp.
+- Dados de exemplo, a trocar pelos de cada cliente: nome ("Nome
+  Sobrenome"), marca ("Seu Estúdio"), Instagram ("@seuinstagram", link a
+  preencher)
+- Cidade e estado ("Sua Cidade, UF") · ano em que começou (calcular anos
+  automaticamente) · seguidores no Instagram (número editável)
+- História: duas ou três frases sobre a trajetória do tatuador
+- Portfólio (fotos em /public/portfolio): título, legenda e estilos de cada
+  trabalho, com filtros por estilo
+- Foto do tatuador 4:5. A preencher: endereço do estúdio, WhatsApp, link do
+  Instagram. Sem eles, os botões de contato ficam no lugar, sem link.
 
 =====================================================================
 ## 2. Identidade visual
@@ -70,7 +70,7 @@ parâmetros visuais ficam num arquivo de configuração tipado.
 - Shader de tela cheia: fumaça fbm com domain warping (mais vermelha no
   final e com a máquina ligada), brilho atrás da máquina seguindo a posição
   dela na tela, raios de luz do canto superior, vinheta.
-- Neon "Lucas / black & gray · realismo" atrás da máquina, letras em
+- Neon "Tattoo / arte na pele" (editável) atrás da máquina, letras em
   contorno, sem tone mapping (cor ~2.2 para bloom), piscando, com luz
   vermelha junto.
 - Spot quente seguindo o foco da câmera, recorte vermelho, ambiente fraco,
@@ -148,10 +148,10 @@ Modelo glTF de qualidade com licença livre, ou modelada com primitivas
 4. Portfólio: câmera recua; filtros Todos, Religioso, Realismo, Black &
    gray; cards com foto em preto e branco que ganha cor no hover, revelação
    animada, inclinação 3D, lightbox; link para o Instagram.
-5. Sobre: foto do Lucas, história, contadores (anos de carreira e
+5. Sobre: foto do tatuador, história, contadores (anos de carreira e
    seguidores), máquina em vista explodida com etiquetas.
 6. Tatue você mesmo: câmera de cima sobre a área livre do braço; painel com
-   ferramentas e formulário; contato (@tattoolucas, São Paulo, SP).
+   ferramentas e formulário; contato (Instagram, cidade e estado).
 
 ## 9. Som (Web Audio, desligado por padrão)
 
