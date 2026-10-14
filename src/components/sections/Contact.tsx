@@ -13,7 +13,7 @@ export function Contact({ id }: { id: SectionId }) {
     <section
       id={id}
       data-section
-      className={`${styles.section} ${styles.panelDownOnPhone}`}
+      className={`${styles.section} ${styles.panelDownInPortrait}`}
       aria-labelledby={`${id}-title`}
     >
       <div className={`${ui.panel} ${styles.contactPanel}`}>

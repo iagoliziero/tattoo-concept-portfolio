@@ -656,10 +656,10 @@ button.card {
   }
 }
 
-/* Em retrato estreito o painel desce e a cena mostra o assunto em cima
-   (a câmera compensa com stations[].portraitShift). */
-@media (max-width: 640px) and (orientation: portrait) {
-  .panelDownOnPhone {
+/* Em retrato (celular e tablet em pé) o painel desce e a cena mostra o
+   assunto em cima (a câmera compensa com stations[].portraitShift). */
+@media (orientation: portrait) {
+  .panelDownInPortrait {
     justify-content: flex-end;
   }
 }

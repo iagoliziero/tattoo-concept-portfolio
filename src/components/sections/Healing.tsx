@@ -7,7 +7,7 @@ export function Healing({ id }: { id: SectionId }) {
   const { healing } = site;
 
   return (
-    <section id={id} data-section className={`${styles.section} ${styles.panelDownOnPhone}`} aria-labelledby={`${id}-title`}>
+    <section id={id} data-section className={`${styles.section} ${styles.panelDownInPortrait}`} aria-labelledby={`${id}-title`}>
       <div className={`${ui.panel} ${styles.healingPanel}`}>
         <p className={`${ui.kicker} ${ui.tight}`}>{healing.kicker}</p>
         <h2 id={`${id}-title`} className={`${ui.display} ${styles.healingTitle}`}>
