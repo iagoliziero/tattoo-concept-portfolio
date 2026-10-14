@@ -192,3 +192,30 @@ Custo da cena ao entrar (celular emulado, CPU 4x, Chrome frio, medianas de 3):
 - Resta, a frio, uma espera de ~2,6 s no primeiro quadro (o driver Direct3D
   ainda finaliza variantes dos shaders no primeiro desenho) e ~1,6 s do mapa
   de ambiente (PMREM), que o three r186 só gera de forma síncrona.
+
+## Etapa 5 · imagens e o resto da página
+
+| Rodada | Nota | FCP | LCP | TBT | CLS | Speed Index | JS na carga |
+|---|---|---|---|---|---|---|---|
+| 1 (mediana) | **81** | 1,41 s | 2,85 s | 467 ms | 0 | 4,12 s | 200 KB |
+| 2 | 81 | 1,39 s | 2,84 s | 476 ms | 0 | 4,03 s | 200 KB |
+| 3 | 75 | 1,37 s | 2,96 s | 686 ms | 0 | 4,15 s | 200 KB |
+
+- `sizes` refeitos a partir do CSS de cada lugar: retrato do Sobre
+  (`clamp(120px, 12vw, 240px)`; antes `180px`, o dobro do necessário no
+  celular), cards do portfólio (a grade é limitada pela altura da tela;
+  antes `14vw`, pequeno demais no desktop) e lightbox (`min(92vw, 960px)`;
+  antes `90vw`).
+- Lazy loading conferido no HTML com fotos de teste: as 8 da galeria e o
+  retrato saem com `loading="lazy"`. A única imagem com prioridade é a do
+  estúdio no fundo, que agora sai com `loading="eager"` (o `getImageProps`
+  vinha com lazy).
+- Fontes: só a Pirata One, via next/font (font-display swap, pré-carregada,
+  15,7 KB); os textos usam fontes do sistema. Nenhum script de terceiros.
+- CSS embutido no HTML (`experimental.inlineCss`) testado lado a lado:
+  mediana 80 com, 81 sem, LCP 2,98 s com e 2,85 s sem. Não ajudou e foi
+  revertido: o LCP simulado depende do JS antes da pintura, não das duas
+  folhas de 5 KB. Relatório da rodada em `perf/etapa5-css-embutido.json`.
+- O maior trabalho de JS que sobra na carga é a criação dos 6 trechos fixos
+  da rolagem (GSAP ScrollTrigger com `pin`): ~160 ms de CPU com layout
+  forçado, dentro da hidratação. Ficou de fora (ver o relatório).

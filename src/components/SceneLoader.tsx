@@ -15,7 +15,14 @@ const WAKE_EVENTS = ["pointerdown", "pointermove", "touchstart", "wheel", "keydo
 // Estúdio em imagem enquanto a cena não chega: uma para o modo leve (celular),
 // que não tem pós-processamento, e outra para telas grandes.
 const { autoStart, fade, placeholder } = visual.sceneEntry;
-const common = { alt: "", sizes: "100vw", quality: placeholder.quality, fetchPriority: "high" } as const;
+// Uma <img> só (o <picture> escolhe o arquivo): carrega já, com prioridade alta.
+const common = {
+  alt: "",
+  sizes: "100vw",
+  quality: placeholder.quality,
+  loading: "eager",
+  fetchPriority: "high",
+} as const;
 const {
   props: { srcSet: mobileSrcSet },
 } = getImageProps({ ...common, ...placeholder.mobile });

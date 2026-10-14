@@ -18,6 +18,20 @@ export interface GalleryItem extends PortfolioItem {
 type Filter = PortfolioCategory | "all";
 const PORTFOLIO_SECTION = 3;
 
+// Largura dos cards para o navegador escolher o arquivo certo. No celular as
+// quatro colunas ocupam a largura toda; em telas maiores a grade é limitada
+// pela altura da tela ((100svh - 300px) * 0,4 por card, ver .grid).
+const CARD_SIZES = [
+  "(max-width: 640px) calc(25vw - 14px)",
+  "(max-width: 1000px) calc(23vw - 8px)",
+  "(max-height: 800px) 200px",
+  "(max-height: 1000px) 280px",
+  "(max-height: 1200px) 360px",
+  "460px",
+].join(", ");
+// Lightbox: min(92vw, 960px) menos o respiro de 18px de cada lado.
+const LIGHTBOX_SIZES = "(max-width: 1043px) calc(92vw - 36px), 924px";
+
 /**
  * Trabalhos em duas linhas de quatro, filtros, revelação animada na primeira chegada à seção, inclinação 3D
  * seguindo o ponteiro e lightbox para as fotos.
@@ -86,7 +100,7 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
                 image={item.image}
                 hasPhoto={item.hasPhoto}
                 placeholder={`Foto: ${item.title}`}
-                sizes="(max-width: 640px) 25vw, 14vw"
+                sizes={CARD_SIZES}
                 className={styles.cardPhoto}
               />
               <span className={styles.cardInfo}>
@@ -137,7 +151,7 @@ export function PortfolioGallery({ items, headingId }: { items: GalleryItem[]; h
         {open && (
           <figure className={styles.lightboxFigure}>
             <div className={styles.lightboxImage}>
-              <Image src={open.image.src} alt={open.image.alt} fill sizes="90vw" />
+              <Image src={open.image.src} alt={open.image.alt} fill sizes={LIGHTBOX_SIZES} />
             </div>
             <figcaption>
               <h3 id="lightbox-title" className={`${ui.display} ${styles.lightboxTitle}`}>

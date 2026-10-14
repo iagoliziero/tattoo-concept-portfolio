@@ -21,7 +21,8 @@ export async function About({ id }: { id: SectionId }) {
           image={artist.photo}
           placeholder="Foto do tatuador"
           icon="user"
-          sizes="180px"
+          // Mesma largura do .portrait: clamp(120px, 12vw, 240px).
+          sizes="(max-width: 1000px) 120px, (max-width: 2000px) 12vw, 240px"
           className={styles.portrait}
         />
         <p className={`${ui.text} ${ui.compact}`}>{about.story}</p>
