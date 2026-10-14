@@ -147,3 +147,48 @@ para o cache de shaders começar vazio; medianas de 3):
 - Visual conferido nas fotos de cada seção: pele, tatuagem do Dia 0 ao 30,
   bancada e gravação da máquina iguais às da etapa 2.
 - O Lighthouse não muda (a cena não carrega durante a medição).
+
+## Etapa 4 · custo de renderização
+
+| Rodada (Lighthouse) | Nota | FCP | LCP | TBT | CLS | Speed Index | JS na carga |
+|---|---|---|---|---|---|---|---|
+| 1 | 81 | 1,47 s | 2,83 s | 474 ms | 0 | 4,07 s | 200 KB |
+| 2 (mediana) | **79** | 0,99 s | 2,61 s | 729 ms | 0 | 1,64 s | 200 KB |
+| 3 | 77 | 1,40 s | 2,93 s | 595 ms | 0 | 4,20 s | 200 KB |
+
+Custo da cena ao entrar (celular emulado, CPU 4x, Chrome frio, medianas de 3):
+
+| | Até o 1º quadro | Bloqueio | Maior tarefa |
+|---|---|---|---|
+| Etapa 3 | 9,75 s | 8,98 s | 6,45 s |
+| Etapa 4 | **5,67 s** | **4,85 s** | **2,60 s** |
+| Etapa 4 sem o worker da etapa 3 | 6,10 s | 5,42 s | 2,68 s |
+
+- Shaders compilados antes do primeiro quadro com `compileAsync`
+  (KHR_parallel_shader_compile): a cena para de desenhar enquanto o
+  navegador compila em paralelo e só volta quando tudo está pronto.
+- `debug.checkShaderErrors` desligado em produção: ler o log de cada shader
+  no primeiro uso travava a página (caro no Direct3D).
+- Sem sombras dinâmicas no modo leve (celular): os materiais compilam sem o
+  código de sombra e não há o passe extra. No desktop continuam.
+- `dpr` entre 1 e 1,5 em qualquer tela (era até 2 fora do modo leve), com o
+  `PerformanceMonitor` do drei descendo para 1 em aparelhos que não
+  acompanham (até 3 trocas).
+- Auditoria: nenhum objeto é criado dentro de `useFrame` e nenhum estado
+  React muda por quadro (progresso da sessão e linha de progresso escrevem
+  direto no DOM com transform). Faltava liberar a geometria do feixe de luz.
+- `frameloop="demand"` não se aplica: fumaça do fundo, poeira, neon, máquina
+  flutuando e feixe animam o tempo todo. Desenhar só sob demanda congelaria
+  esses efeitos.
+- Animações fora do 3D: linha de progresso, barra da sessão e etiquetas da
+  máquina usam transform/opacity. A revelação das fotos do portfólio usa
+  clip-path (roda uma vez, 0,9 s); trocar por transform mudaria o efeito.
+- O worker da etapa 3, reavaliado com a compilação fora do caminho, poupa
+  ~0,5 s de bloqueio na entrada e fica.
+- A carga medida pelo Lighthouse é a mesma desde a etapa 1 (204,7 KB de JS,
+  diferença de 31 bytes); as mesmas tarefas ficaram mais longas porque a
+  máquina estava mais carregada (1,8 GB livres). A comparação final roda o
+  antes e o depois em sequência, nas mesmas condições.
+- Resta, a frio, uma espera de ~2,6 s no primeiro quadro (o driver Direct3D
+  ainda finaliza variantes dos shaders no primeiro desenho) e ~1,6 s do mapa
+  de ambiente (PMREM), que o three r186 só gera de forma síncrona.

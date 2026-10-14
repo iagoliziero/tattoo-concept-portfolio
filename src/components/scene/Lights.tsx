@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   AdditiveBlending,
   ConeGeometry,
@@ -65,6 +65,8 @@ export function Lights({ post, shadowMapSize }: { post: boolean; shadowMapSize: 
     geometry.rotateX(-Math.PI / 2);
     return geometry;
   }, []);
+  // Passada por prop, a geometria não é liberada sozinha quando a cena sai.
+  useEffect(() => () => beamGeometry.dispose(), [beamGeometry]);
   const beamUniforms = useMemo(
     () => ({
       uT: { value: 0 },

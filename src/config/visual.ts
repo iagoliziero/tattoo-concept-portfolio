@@ -154,7 +154,14 @@ export interface VisualConfig {
     snapDuration: { min: number; max: number };
   };
   renderer: {
+    /**
+     * Resolução da cena (devicePixelRatio) entre min e max: o PerformanceMonitor
+     * desce para o mínimo quando o aparelho não acompanha e volta quando
+     * sobra fôlego, até desistir depois de `adaptiveFlipflops` trocas.
+     */
     maxPixelRatio: number;
+    minPixelRatio: number;
+    adaptiveFlipflops: number;
     toneMappingExposure: number;
     shadowMapSize: number;
     shadowBias: number;
@@ -424,10 +431,10 @@ export interface VisualConfig {
   /** Contadores do Sobre. */
   countUp: { duration: number };
   /**
-   * Modo leve (celular e telas de toque): sem MSAA nem bloom, menos
-   * partículas, sombras e resolução menores. Liga quando `query` casa.
+   * Modo leve (celular e telas de toque): sem pós-processamento (MSAA, bloom)
+   * nem sombras dinâmicas, e menos partículas. Liga quando `query` casa.
    */
-  lightMode: { query: string; maxPixelRatio: number; shadowMapSize: number; dust: number; droplets: number };
+  lightMode: { query: string; dust: number; droplets: number };
   /**
    * Entrada da cena 3D. A página abre com uma imagem estática do estúdio e a
    * cena só carrega na primeira interação (toque, rolagem, mouse, teclado) ou,
@@ -494,7 +501,10 @@ export const visual = {
     snapDuration: { min: 0.3, max: 0.8 },
   },
   renderer: {
-    maxPixelRatio: 2,
+    // Era 2: acima de 1,5 o custo por pixel cresce muito e a diferença quase não aparece.
+    maxPixelRatio: 1.5,
+    minPixelRatio: 1,
+    adaptiveFlipflops: 3,
     toneMappingExposure: 1.05,
     shadowMapSize: 2048,
     shadowBias: -0.0003,
@@ -790,13 +800,7 @@ export const visual = {
   // Revelação (.9 s) e inclinação (10°/12°, -3 px) do protótipo.
   portfolio: { columns: 4, revealDuration: 0.9, revealStagger: 0.08, tilt: [10, 12], lift: 3 },
   countUp: { duration: 1.4 },
-  lightMode: {
-    query: "(pointer: coarse), (max-width: 767.98px)",
-    maxPixelRatio: 1.5,
-    shadowMapSize: 1024,
-    dust: 160,
-    droplets: 35,
-  },
+  lightMode: { query: "(pointer: coarse), (max-width: 767.98px)", dust: 160, droplets: 35 },
   sceneEntry: {
     autoStart: 4500,
     fade: 0.8,
